@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    cursor: none !important;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-zinc-950 text-zinc-100 font-sans antialiased overflow-x-hidden;
+  }
+
+  ::selection {
+    background: #e8ff00;
+    color: #0d0d0d;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-[#e8ff00] ring-offset-2 ring-offset-zinc-950;
+  }
+}
+
+/* ── Grain overlay ─────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.035;
+}
+
+/* ── Ambient orbs ──────────────────────────────────────────── */
+.orb {
+  position: fixed;
+  border-radius: 9999px;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Reveal animation ──────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ── Magnetic button ───────────────────────────────────────── */
+.magnetic {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* ── Horizontal marquee ────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 20s linear infinite;
+  display: flex;
+  white-space: nowrap;
+}
+
+/* ── Scramble text cursor blink ────────────────────────────── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.scramble-cursor {
+  animation: blink 0.6s step-start infinite;
+}
+
+/* ── Oral presentation cursor restore ─────────────────────── */
+body[data-oral] *,
+body[data-oral] button {
+  cursor: auto !important;
+}
+body[data-oral] button {
+  cursor: pointer !important;
+}
+body[data-oral] a {
+  cursor: pointer !important;
+}
+
+/* ── Oral slide enter animation ────────────────────────────── */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-enter {
+  animation: slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Card hover glow ───────────────────────────────────────── */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(232, 255, 0, 0.06), transparent 40%);
+  pointer-events: none;
+  transition: opacity 0.3s;
+  opacity: 0;
+  z-index: 1;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}

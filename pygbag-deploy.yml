@@ -1,0 +1,32 @@
+# À placer dans .github/workflows/deploy.yml dans le repo de ton jeu
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pygbag
+        run: pip install pygbag
+
+      - name: Build with pygbag
+        # Remplace main.py par le nom de ton fichier principal si différent
+        run: python -m pygbag --build main.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web

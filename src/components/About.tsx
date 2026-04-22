@@ -58,8 +58,8 @@ export default function About() {
           {/* Number stat decorations */}
           <div className="grid grid-cols-2 gap-6 mt-12 pt-10 border-t border-white/5">
             {[
-              { n: '3+', label: 'ans d\'expérience' },
-              { n: '20+', label: 'projets livrés' },
+              { n: '3', label: 'ans d\'expérience' },
+              { n: '2', label: 'projets livrés et d\'autres commencés' },
             ].map(({ n, label }) => (
               <div key={n}>
                 <p className="text-5xl font-black text-accent">{n}</p>

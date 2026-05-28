@@ -10,10 +10,13 @@ interface FormState {
 export default function Contact() {
   const [form, setForm] = useState<FormState>({ name: '', email: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
-  const titleRef = useReveal()
+  const titleRef = useReveal<HTMLDivElement>()
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
+    const subject = encodeURIComponent(`Contact portfolio — ${form.name}`)
+    const body = encodeURIComponent(`Nom : ${form.name}\nEmail : ${form.email}\n\n${form.message}`)
+    window.location.href = `mailto:ratonlaveur14052005@gmail.com?subject=${subject}&body=${body}`
     setSubmitted(true)
   }
 
@@ -32,7 +35,7 @@ export default function Contact() {
           <span className="font-mono text-[10px] tracking-widest text-zinc-600 uppercase">Contact</span>
         </div>
 
-        <div ref={titleRef as React.RefObject<HTMLDivElement>} className="reveal grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div ref={titleRef} className="reveal grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
 
           {/* Left */}
           <div>
@@ -64,26 +67,36 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate data-testid="contact-form" className="space-y-5">
-                {[
-                  { id: 'name', label: 'Nom', type: 'text', placeholder: 'Jean Dupont', key: 'name' as const },
-                  { id: 'email', label: 'Email', type: 'email', placeholder: 'jean@example.com', key: 'email' as const },
-                ].map((field) => (
-                  <div key={field.id}>
-                    <label htmlFor={field.id} className="block font-mono text-[10px] tracking-widest text-zinc-500 uppercase mb-2">
-                      {field.label}
-                    </label>
-                    <input
-                      id={field.id}
-                      type={field.type}
-                      required
-                      value={form[field.key]}
-                      onChange={(e) => setForm((f) => ({ ...f, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      className="w-full bg-transparent border-b border-white/10 text-white placeholder-zinc-700
-                                 py-3 text-sm focus:border-accent focus:outline-none transition-colors"
-                    />
-                  </div>
-                ))}
+                <div>
+                  <label htmlFor="name" className="block font-mono text-[10px] tracking-widest text-zinc-500 uppercase mb-2">
+                    Nom
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    placeholder="Jean Dupont"
+                    className="w-full bg-transparent border-b border-white/10 text-white placeholder-zinc-700
+                               py-3 text-sm focus:border-accent focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block font-mono text-[10px] tracking-widest text-zinc-500 uppercase mb-2">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    placeholder="jean@example.com"
+                    className="w-full bg-transparent border-b border-white/10 text-white placeholder-zinc-700
+                               py-3 text-sm focus:border-accent focus:outline-none transition-colors"
+                  />
+                </div>
                 <div>
                   <label htmlFor="message" className="block font-mono text-[10px] tracking-widest text-zinc-500 uppercase mb-2">
                     Message

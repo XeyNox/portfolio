@@ -52,6 +52,7 @@ export default function GameModal({ title, url, onClose }: GameModalProps) {
           title={title}
           className="flex-1 w-full"
           allow="autoplay"
+          sandbox="allow-scripts allow-same-origin"
         />
       </div>
     </div>

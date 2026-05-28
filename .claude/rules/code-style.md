@@ -38,7 +38,7 @@
 
 - Order classes: layout → sizing → spacing → typography → color → effects → responsive
 - Extract repeated utility combos into a component, not a custom class
-- Use `cn()` (or `clsx`) to conditionally merge classes — never string concatenation
+- Use template literals or ternary expressions to conditionally merge classes — never string concatenation
 - Keep responsive variants (`sm:`, `md:`, `lg:`) at the end of the class list
 
 ## Comments

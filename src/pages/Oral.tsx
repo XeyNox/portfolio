@@ -692,8 +692,8 @@ export default function Oral() {
             <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
           )}
           <ul className="space-y-4 mt-8">
-            {slide.points.map(point => (
-              <li key={point} className="flex items-start gap-4 text-zinc-300 text-lg">
+            {slide.points.map((point, i) => (
+              <li key={i} className="flex items-start gap-4 text-zinc-300 text-lg">
                 <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
                 <span>{point}</span>
               </li>

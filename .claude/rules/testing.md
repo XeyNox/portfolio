@@ -48,6 +48,7 @@ it('shows error when email is invalid', async () => {
 ```bash
 npm test             # watch mode (development)
 npm test -- --run    # single pass (CI)
+npm run test:ui      # visual UI in browser
 npm run test:coverage
 ```
 

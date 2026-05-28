@@ -121,7 +121,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 export default function Projects() {
-  const titleRef = useReveal()
+  const titleRef = useReveal<HTMLDivElement>()
 
   return (
     <section id="projects" data-testid="projects" className="relative py-32 px-6 lg:px-10 max-w-7xl mx-auto">
@@ -133,7 +133,7 @@ export default function Projects() {
         <span className="font-mono text-[10px] tracking-widest text-zinc-600 uppercase">Projets sélectionnés</span>
       </div>
 
-      <div ref={titleRef as React.RefObject<HTMLDivElement>} className="reveal grid lg:grid-cols-2 gap-4">
+      <div ref={titleRef} className="reveal grid lg:grid-cols-2 gap-4">
         {projects.map((project, i) => (
           <ProjectCard key={project.id} project={project} index={i} />
         ))}

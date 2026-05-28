@@ -2,8 +2,8 @@ import { useReveal } from '../hooks/useReveal'
 import { skills } from '../data/portfolio'
 
 export default function About() {
-  const titleRef = useReveal()
-  const contentRef = useReveal()
+  const titleRef = useReveal<HTMLDivElement>()
+  const contentRef = useReveal<HTMLDivElement>()
 
   return (
     <section id="about" data-testid="about" className="relative py-32 px-6 lg:px-10 max-w-7xl mx-auto">
@@ -17,7 +17,7 @@ export default function About() {
       <div className="grid lg:grid-cols-[1fr_1fr] gap-16 lg:gap-24 items-start">
 
         {/* Left */}
-        <div ref={titleRef as React.RefObject<HTMLDivElement>} className="reveal">
+        <div ref={titleRef} className="reveal">
           <h2 className="text-5xl sm:text-7xl font-black tracking-tight text-white leading-[0.9] mb-10">
             Coder<br />
             <span className="text-zinc-600">c'est un art</span>
@@ -33,7 +33,7 @@ export default function About() {
         </div>
 
         {/* Right — skills as a grid of pills */}
-        <div ref={contentRef as React.RefObject<HTMLDivElement>} className="reveal reveal-delay-2">
+        <div ref={contentRef} className="reveal reveal-delay-2">
           <div className="space-y-8">
             {skills.map((group) => (
               <div key={group.category}>

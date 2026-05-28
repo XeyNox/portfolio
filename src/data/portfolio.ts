@@ -53,8 +53,8 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com',
     liveUrl: 'https://example.com',
   },
-  {               
-    id: 'game',
+  {
+    id: 'mielus',
     title: 'Mielus Belly',
     description: '...',
     tags: ['Python', 'Pygame', 'Game Dev'],           

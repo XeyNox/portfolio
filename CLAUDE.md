@@ -7,9 +7,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # start dev server
 npm run build        # type-check + Vite build
+npm run preview      # preview production build locally
 npm run lint         # ESLint (zero warnings allowed)
 npm test             # run tests in watch mode
 npm test -- --run    # run tests once (used in CI)
+npm run test:ui      # Vitest UI in browser
 npm run test:coverage
 ```
 
@@ -17,7 +19,11 @@ npm run test:coverage
 
 Single-page portfolio built with React 18 + TypeScript + Vite + TailwindCSS, deployed on Vercel.
 
-**Page layout** (`src/App.tsx`): `<Cursor>` + `<Header>` + sections (Hero → About → Projects → Contact) + `<Footer>`. All sections are anchor-linked (`#projects`, `#contact`).
+**Routing** (`src/App.tsx`): React Router v7. Two routes:
+- `/` → `Portfolio` component: `<Cursor>` + `<Header>` + sections (Hero → About → Projects → Contact) + `<Footer>`. All sections are anchor-linked (`#projects`, `#contact`).
+- `/oral` → `src/pages/Oral.tsx` (standalone page, no header/footer)
+
+**Components** (`src/components/`): Hero, About, Projects, Contact, Header, Footer, Cursor, GameModal.
 
 **Data** (`src/data/portfolio.ts`): All content (projects, skills) lives here as typed exports. Edit this file to update portfolio content.
 

@@ -16,7 +16,7 @@ const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'SMP-Commercial',
     subtitle: 'Application Android de présentation commerciale — Titre RNCP Développeur Full Stack · Niveau 6',
-    points: ['Votre prénom NOM', 'Alternance chez SMP Moules', 'Année 20XX–20XX'],
+    points: ['Loic Michaud', 'Alternance chez SMP Moules', 'Année 2025–2026'],
   },
   {
     id: 'entreprise',

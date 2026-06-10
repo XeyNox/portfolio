@@ -16,7 +16,7 @@ const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'SMP-Commercial',
     subtitle: 'Application Android de présentation commerciale — Titre RNCP Développeur Full Stack · Niveau 6',
-    points: ['Loic Michaud', 'Alternance chez SMP Moules', 'Année 2025–2026'],
+    points: ['Votre prénom NOM', 'Alternance chez SMP Moules', 'Année 20XX–20XX'],
   },
   {
     id: 'entreprise',
@@ -25,9 +25,9 @@ const SLIDES: Slide[] = [
     subtitle: "Contexte de l'alternance",
     points: [
       "Entreprise spécialisée dans la fabrication de moules industriels",
-      "Secteurs clients : pharmacie, cosmétique, emballage, automobile, aérospatial",
+      "Secteurs clients : pharmacie, cosmétique, emballage",
       "Besoin : moderniser la présentation commerciale en salon professionnel",
-      "Mon rôle : développeur mobile en alternance",
+      "Mon rôle : développeur mobile et informaticien en alternance",
     ],
   },
   {
@@ -36,9 +36,9 @@ const SLIDES: Slide[] = [
     title: 'Problématique métier',
     subtitle: 'Pourquoi ce projet ?',
     points: [
-      "Les commerciaux présentaient les produits avec des catalogues papier",
+      "Les commerciaux présentaient les produits sous format physique  ",
       "Aucune capture structurée des contacts prospects en salon",
-      "Impossibilité de montrer des modèles 3D ou des vidéos produit",
+      "Impossibilité de montrer des vidéos produit",
       "Objectif : une application kiosque interactive, offline, sur tablette Android",
     ],
   },
@@ -47,7 +47,7 @@ const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'Objectifs du projet',
     points: [
-      "Catalogue produit multimédia : images, vidéos, PDF, modèles 3D",
+      "Catalogue produit multimédia : images, vidéos, PDF",
       "Formulaire de capture de leads avec photo de carte de visite",
       "Fonctionnement hors ligne avec base de données locale",
       "Panel admin pour mettre à jour les contenus sans redéployer",
@@ -141,7 +141,6 @@ const SLIDES: Slide[] = [
     title: 'Librairies multimédia',
     points: [
       "CameraX 1.3.1 — capture photo de carte de visite",
-      "Google Filament 1.70.0 — rendu 3D GPU (GLB/GLTF)",
       "Media3 ExoPlayer 1.2.1 — lecture vidéo",
       "Coil 2.5.0 — chargement et cache des images",
       "AndroidX WebKit 1.12.1 — visualisation PDF",
@@ -220,19 +219,6 @@ const SLIDES: Slide[] = [
       "Accès sécurisé via AndroidX FileProvider",
       "Navigation plein écran sans quitter l'app",
       "Utilisation : fiches techniques, catalogues produit",
-    ],
-  },
-  {
-    id: 'filament',
-    section: 'Fonctionnalités',
-    title: 'Visualiseur 3D',
-    subtitle: 'Google Filament 1.70.0',
-    points: [
-      "Rendu physiquement basé (PBR) sur GPU via OpenGL ES",
-      "Formats supportés : GLB / GLTF",
-      "Interactions tactiles — rotation, zoom, translation",
-      "FilamentViewer.kt — gestion du lifecycle Filament",
-      "ModelViewerViewModel — chargement async depuis stockage",
     ],
   },
   {
@@ -405,9 +391,9 @@ const SLIDES: Slide[] = [
     id: 'defi-media',
     section: 'Défis',
     title: 'Défi 1 — Médias lourds',
-    subtitle: 'Images, vidéos, PDFs, modèles 3D',
+    subtitle: 'Images, vidéos, PDFs',
     points: [
-      "Problème : chargement lent et OOM sur modèles 3D > 50 Mo",
+      "Problème : chargement lent",
       "Solution : chargement async sur Dispatchers.IO + Coil pour images",
       "Large heap (android:largeHeap=\"true\") pour Filament",
       "Bitmap sampling (inSampleSize) pour réduire la mémoire photos",
@@ -415,21 +401,9 @@ const SLIDES: Slide[] = [
     ],
   },
   {
-    id: 'defi-filament',
-    section: 'Défis',
-    title: 'Défi 2 — Intégration Filament 3D',
-    points: [
-      "Problème : Filament nécessite une gestion manuelle du lifecycle",
-      "Solution : FilamentViewer.kt encapsule Engine, Renderer, SwapChain",
-      "Destruction explicite dans onCleared() du ViewModel",
-      "SurfaceView dédié rattaché au cycle de vie Compose",
-      "→ Rendu 3D stable, pas de fuite mémoire GPU",
-    ],
-  },
-  {
     id: 'defi-offline',
     section: 'Défis',
-    title: 'Défi 3 — Offline-first',
+    title: 'Défi 2 — Offline-first',
     subtitle: 'Application 100% fonctionnelle sans réseau',
     points: [
       "Problème : salons professionnels souvent sans WiFi fiable",
@@ -442,7 +416,7 @@ const SLIDES: Slide[] = [
   {
     id: 'defi-smtp',
     section: 'Défis',
-    title: 'Défi 4 — Email SMTP sur Android',
+    title: 'Défi 3 — Email SMTP sur Android',
     points: [
       "Problème : Android bloque les opérations réseau sur le main thread",
       "Solution : EmailService.kt sur Dispatchers.IO via coroutine",
@@ -454,7 +428,7 @@ const SLIDES: Slide[] = [
   {
     id: 'defi-multilingue',
     section: 'Défis',
-    title: 'Défi 5 — Multilingue dynamique',
+    title: 'Défi 4 — Multilingue dynamique',
     points: [
       "Problème : les chaînes doivent être modifiables par l'admin",
       "Solution : ContentManager stocke les overrides dans APP_SETTINGS",
@@ -557,9 +531,9 @@ const SLIDES: Slide[] = [
     section: 'Bilan',
     title: 'Apport pour SMP Moules',
     points: [
-      "Remplacement des catalogues papier par une app interactive",
-      "Capture structurée des leads — fini les cartes de visite perdues",
-      "Export automatique des contacts vers le CRM via email",
+      "Remplacement des feuilles de prise de contact papier par une app interactive",
+      "Fini les cartes de visite perdues",
+      "Export automatique des contacts via email",
       "Autonomie : les commerciaux mettent à jour les contenus eux-mêmes",
       "Image moderne de l'entreprise lors des salons professionnels",
     ],
@@ -632,7 +606,7 @@ export default function Oral() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col">
-      {/* Top bar */}
+      {/* Top bar */} 
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
         <Link to="/" className="font-mono text-xs text-zinc-500 hover:text-[#e8ff00] transition-colors">
           ← Portfolio
@@ -692,8 +666,8 @@ export default function Oral() {
             <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
           )}
           <ul className="space-y-4 mt-8">
-            {slide.points.map((point, i) => (
-              <li key={i} className="flex items-start gap-4 text-zinc-300 text-lg">
+            {slide.points.map(point => (
+              <li key={point} className="flex items-start gap-4 text-zinc-300 text-lg">
                 <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
                 <span>{point}</span>
               </li>

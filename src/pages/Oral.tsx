@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+interface SlidePoint {
+  text: string
+  detail?: string
+  image?: string
+  video?: string
+}
+
 interface Slide {
   id: string
   section: string
   title: string
   subtitle?: string
-  points: string[]
+  points: SlidePoint[]
 }
 
 const SLIDES: Slide[] = [
@@ -16,7 +23,11 @@ const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'SMP-Commercial',
     subtitle: 'Application Android de présentation commerciale — Titre RNCP Développeur Full Stack · Niveau 6',
-    points: ['Loic Michaud', 'Alternance chez SMP Moules', 'Année 2025–2026'],
+    points: [
+      { text: 'Loic Michaud' },
+      { text: 'Alternance chez SMP Moules' },
+      { text: 'Année 2025–2026' },
+    ],
   },
   {
     id: 'entreprise',
@@ -24,10 +35,10 @@ const SLIDES: Slide[] = [
     title: 'SMP Moules',
     subtitle: "Contexte de l'alternance",
     points: [
-      "Entreprise spécialisée dans la fabrication de moules industriels",
-      "Secteurs clients : pharmacie, cosmétique, emballage",
-      "Besoin : moderniser la présentation commerciale en salon professionnel",
-      "Mon rôle : développeur mobile et informaticien en alternance",
+      { text: "Entreprise spécialisée dans la fabrication de moules industriels" },
+      { text: "Secteurs clients : pharmacie, cosmétique, emballage" },
+      { text: "Besoin : moderniser la présentation commerciale en salon professionnel" },
+      { text: "Mon rôle : développeur mobile et informaticien en alternance" },
     ],
   },
   {
@@ -36,10 +47,10 @@ const SLIDES: Slide[] = [
     title: 'Problématique métier',
     subtitle: 'Pourquoi ce projet ?',
     points: [
-      "Les commerciaux présentaient les produits sous format physique  ",
-      "Aucune capture structurée des contacts prospects en salon",
-      "Impossibilité de montrer des vidéos produit",
-      "Objectif : une application kiosque interactive, offline, sur tablette Android",
+      { text: "Les commerciaux présentaient les produits sous format physique" },
+      { text: "Aucune capture structurée des contacts prospects en salon" },
+      { text: "Impossibilité de montrer des vidéos produit" },
+      { text: "Objectif : une application kiosque interactive, offline, sur tablette Android" },
     ],
   },
   {
@@ -47,11 +58,11 @@ const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'Objectifs du projet',
     points: [
-      "Catalogue produit multimédia : images, vidéos, PDF",
-      "Formulaire de capture de leads avec photo de carte de visite",
-      "Fonctionnement hors ligne avec base de données locale",
-      "Panel admin pour mettre à jour les contenus sans redéployer",
-      "Export des contacts par email avec rapport PDF",
+      { text: "Catalogue produit multimédia : images, vidéos, PDF" },
+      { text: "Formulaire de capture de leads avec photo de carte de visite" },
+      { text: "Fonctionnement hors ligne avec base de données locale" },
+      { text: "Panel admin pour mettre à jour les contenus sans redéployer" },
+      { text: "Export des contacts par email avec rapport PDF" },
     ],
   },
 
@@ -62,11 +73,11 @@ const SLIDES: Slide[] = [
     title: 'Choix de la plateforme',
     subtitle: 'Android natif vs cross-platform',
     points: [
-      "React Native / Flutter → performances insuffisantes pour le rendu 3D",
-      "PWA → pas d'accès natif à CameraX, Filament, stockage",
-      "Android natif Kotlin → accès complet aux APIs hardware",
-      "Jetpack Compose → UI déclarative moderne, maintenance simplifiée",
-      "→ Choix : Android natif Kotlin + Compose Material 3",
+      { text: "React Native / Flutter → performances insuffisantes pour le rendu 3D" },
+      { text: "PWA → pas d'accès natif à CameraX, Filament, stockage" },
+      { text: "Android natif Kotlin → accès complet aux APIs hardware" },
+      { text: "Jetpack Compose → UI déclarative moderne, maintenance simplifiée" },
+      { text: "→ Choix : Android natif Kotlin + Compose Material 3" },
     ],
   },
   {
@@ -75,10 +86,10 @@ const SLIDES: Slide[] = [
     title: 'Architecture MVVM + Clean',
     subtitle: '3 couches strictement séparées',
     points: [
-      "Domain Layer — interfaces Repository, modèles métier purs",
-      "Data Layer — implémentations Room, DAOs, services (SMTP, email)",
-      "Presentation Layer — ViewModels, états UI, composables Compose",
-      "→ Couplage faible, testabilité maximale, évolutivité",
+      { text: "Domain Layer — interfaces Repository, modèles métier purs" },
+      { text: "Data Layer — implémentations Room, DAOs, services (SMTP, email)" },
+      { text: "Presentation Layer — ViewModels, états UI, composables Compose" },
+      { text: "→ Couplage faible, testabilité maximale, évolutivité" },
     ],
   },
   {
@@ -87,11 +98,11 @@ const SLIDES: Slide[] = [
     title: 'Flux de données',
     subtitle: 'MVVM avec StateFlow et Coroutines',
     points: [
-      "UI Compose — observe StateFlow via collectAsStateWithLifecycle()",
-      "ViewModel — expose états UI, orchestre les cas d'usage",
-      "Repository (interface) — contrat du Domain Layer",
-      "RepositoryImpl (data) — implémentation Room + services",
-      "Room DAO → SQLite local — persistance offline-first",
+      { text: "UI Compose — observe StateFlow via collectAsStateWithLifecycle()" },
+      { text: "ViewModel — expose états UI, orchestre les cas d'usage" },
+      { text: "Repository (interface) — contrat du Domain Layer" },
+      { text: "RepositoryImpl (data) — implémentation Room + services" },
+      { text: "Room DAO → SQLite local — persistance offline-first" },
     ],
   },
   {
@@ -100,11 +111,11 @@ const SLIDES: Slide[] = [
     title: 'Schéma de base de données',
     subtitle: '5 entités Room / SQLite',
     points: [
-      "CATEGORIES — id, nom, description, emoji, imagePath, ordre",
-      "PRODUCTS — id, categoryId (FK), nom, specs, imagePaths (JSON), model3dPath, videoPath, pdfPath",
-      "CONTACTS — id, société, email, téléphone, secteurs, photoPath, statut (pending|sent), timestamps",
-      "MEDIA_FILES — id, fileName, filePath, mimeType, fileSize",
-      "APP_SETTINGS — clé / valeur (config SMTP, traductions, paramètres admin)",
+      { text: "CATEGORIES — id, nom, description, emoji, imagePath, ordre" },
+      { text: "PRODUCTS — id, categoryId (FK), nom, specs, imagePaths (JSON), model3dPath, videoPath, pdfPath" },
+      { text: "CONTACTS — id, société, email, téléphone, secteurs, photoPath, statut (pending|sent), timestamps" },
+      { text: "MEDIA_FILES — id, fileName, filePath, mimeType, fileSize" },
+      { text: "APP_SETTINGS — clé / valeur (config SMTP, traductions, paramètres admin)" },
     ],
   },
   {
@@ -113,10 +124,10 @@ const SLIDES: Slide[] = [
     title: 'Injection de dépendances',
     subtitle: 'Koin 3.5.3 — 3 modules',
     points: [
-      "DatabaseModule — Room AppDatabase, tous les DAOs",
-      "RepositoryModule — lie interfaces Domain aux implémentations Data",
-      "ViewModelModule — ViewModels de chaque écran",
-      "→ Aucun couplage direct entre couches, mocks faciles en test",
+      { text: "DatabaseModule — Room AppDatabase, tous les DAOs" },
+      { text: "RepositoryModule — lie interfaces Domain aux implémentations Data" },
+      { text: "ViewModelModule — ViewModels de chaque écran" },
+      { text: "→ Aucun couplage direct entre couches, mocks faciles en test" },
     ],
   },
 
@@ -127,12 +138,12 @@ const SLIDES: Slide[] = [
     title: 'Stack technique',
     subtitle: "Vue d'ensemble",
     points: [
-      "Langage : Kotlin 2.1.0 — coroutines, extension functions, sealed classes",
-      "UI : Jetpack Compose + Material 3 (BOM 2024.12)",
-      "Base de données : Room 2.6.1 (SQLite, DAOs, Flow réactif)",
-      "DI : Koin 3.5.3",
-      "Build : Gradle 9.3.1 + libs.versions.toml centralisé",
-      "SDK min : Android 24 · Target : Android 35",
+      { text: "Langage : Kotlin 2.1.0 — coroutines, extension functions, sealed classes" },
+      { text: "UI : Jetpack Compose + Material 3 (BOM 2024.12)" },
+      { text: "Base de données : Room 2.6.1 (SQLite, DAOs, Flow réactif)" },
+      { text: "DI : Koin 3.5.3" },
+      { text: "Build : Gradle 9.3.1 + libs.versions.toml centralisé" },
+      { text: "SDK min : Android 24 · Target : Android 35" },
     ],
   },
   {
@@ -140,10 +151,10 @@ const SLIDES: Slide[] = [
     section: 'Stack',
     title: 'Librairies multimédia',
     points: [
-      "CameraX 1.3.1 — capture photo de carte de visite",
-      "Media3 ExoPlayer 1.2.1 — lecture vidéo",
-      "Coil 2.5.0 — chargement et cache des images",
-      "AndroidX WebKit 1.12.1 — visualisation PDF",
+      { text: "CameraX 1.3.1 — capture photo de carte de visite" },
+      { text: "Media3 ExoPlayer 1.2.1 — lecture vidéo" },
+      { text: "Coil 2.5.0 — chargement et cache des images" },
+      { text: "AndroidX WebKit 1.12.1 — visualisation PDF" },
     ],
   },
   {
@@ -151,11 +162,11 @@ const SLIDES: Slide[] = [
     section: 'Stack',
     title: 'Services & intégrations',
     points: [
-      "Angus Mail (Jakarta Mail) 2.0.2 — envoi SMTP avec SSL/TLS",
-      "ML Kit Translate 17.0.3 — traduction multilingue on-device",
-      "Android PdfDocument API — génération de rapports PDF",
-      "kotlinx-serialization — sérialisation JSON (imagePaths en BDD)",
-      "JUnit 4/5 + Mockk + Turbine — tests unitaires et Flow",
+      { text: "Angus Mail (Jakarta Mail) 2.0.2 — envoi SMTP avec SSL/TLS" },
+      { text: "ML Kit Translate 17.0.3 — traduction multilingue on-device" },
+      { text: "Android PdfDocument API — génération de rapports PDF" },
+      { text: "kotlinx-serialization — sérialisation JSON (imagePaths en BDD)" },
+      { text: "JUnit 4/5 + Mockk + Turbine — tests unitaires et Flow" },
     ],
   },
 
@@ -165,11 +176,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Navigation & architecture UI',
     points: [
-      "Single-Activity — un seul MainActivity, tout en Compose",
-      "Jetpack Navigation Compose 2.8.5 — NavGraph typé",
-      "BottomNavBar — Accueil · Catalogue · Contact · Export",
-      "SMPHeader — barre supérieure unifiée avec accès admin",
-      "Landscape forcé — orientation optimisée kiosque tablette",
+      { text: "Single-Activity — un seul MainActivity, tout en Compose" },
+      { text: "Jetpack Navigation Compose 2.8.5 — NavGraph typé" },
+      { text: "BottomNavBar — Accueil · Catalogue · Contact · Export" },
+      { text: "SMPHeader — barre supérieure unifiée avec accès admin" },
+      { text: "Landscape forcé — orientation optimisée kiosque tablette" },
     ],
   },
   {
@@ -177,11 +188,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: "Écran d'accueil",
     points: [
-      "Page d'entrée de l'application kiosque",
-      "Branding SMP Moules avec logo et présentation",
-      "Accès rapide aux sections principales",
-      "Mode présentation — plein écran immersif (system bars masquées)",
-      "Screen toujours allumé (FLAG_KEEP_SCREEN_ON)",
+      { text: "Page d'entrée de l'application kiosque" },
+      { text: "Branding SMP Moules avec logo et présentation" },
+      { text: "Accès rapide aux sections principales" },
+      { text: "Mode présentation — plein écran immersif (system bars masquées)" },
+      { text: "Screen toujours allumé (FLAG_KEEP_SCREEN_ON)" },
     ],
   },
   {
@@ -190,11 +201,11 @@ const SLIDES: Slide[] = [
     title: 'Catalogue produits',
     subtitle: 'Grille de catégories',
     points: [
-      "Grille responsive — 2 colonnes (téléphone) · 3+ (tablette)",
-      "Cartes catégorie avec emoji, image et nom",
-      "Données chargées depuis Room via CatalogViewModel (Flow)",
-      "Admin : ajout / suppression de catégories, upload image",
-      "Navigation → liste des produits de la catégorie",
+      { text: "Grille responsive — 2 colonnes (téléphone) · 3+ (tablette)" },
+      { text: "Cartes catégorie avec emoji, image et nom" },
+      { text: "Données chargées depuis Room via CatalogViewModel (Flow)" },
+      { text: "Admin : ajout / suppression de catégories, upload image" },
+      { text: "Navigation → liste des produits de la catégorie" },
     ],
   },
   {
@@ -202,11 +213,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Détail produit',
     points: [
-      "Nom, description, spécifications techniques",
-      "Galerie d'images avec Coil (cache disque + mémoire)",
-      "Boutons d'accès aux médias : PDF · Vidéo · Modèle 3D",
-      "Admin : édition inline des textes, upload de médias",
-      "Persistance via ProductRepositoryImpl → Room",
+      { text: "Nom, description, spécifications techniques" },
+      { text: "Galerie d'images avec Coil (cache disque + mémoire)" },
+      { text: "Boutons d'accès aux médias : PDF · Vidéo · Modèle 3D" },
+      { text: "Admin : édition inline des textes, upload de médias" },
+      { text: "Persistance via ProductRepositoryImpl → Room" },
     ],
   },
   {
@@ -214,11 +225,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Visualiseur PDF',
     points: [
-      "Chargement via AndroidX WebKit (WebView sécurisé)",
-      "Fichiers PDF stockés localement dans le stockage interne",
-      "Accès sécurisé via AndroidX FileProvider",
-      "Navigation plein écran sans quitter l'app",
-      "Utilisation : fiches techniques, catalogues produit",
+      { text: "Chargement via AndroidX WebKit (WebView sécurisé)" },
+      { text: "Fichiers PDF stockés localement dans le stockage interne" },
+      { text: "Accès sécurisé via AndroidX FileProvider" },
+      { text: "Navigation plein écran sans quitter l'app" },
+      { text: "Utilisation : fiches techniques, catalogues produit" },
     ],
   },
   {
@@ -227,10 +238,10 @@ const SLIDES: Slide[] = [
     title: 'Lecteur vidéo',
     subtitle: 'Media3 ExoPlayer 1.2.1',
     points: [
-      "Lecture de vidéos produit stockées localement",
-      "Contrôles natifs (play/pause, seek, plein écran)",
-      "Intégré dans le DetailScreen au côté des autres médias",
-      "Gestion du lifecycle — pause automatique en background",
+      { text: "Lecture de vidéos produit stockées localement" },
+      { text: "Contrôles natifs (play/pause, seek, plein écran)" },
+      { text: "Intégré dans le DetailScreen au côté des autres médias" },
+      { text: "Gestion du lifecycle — pause automatique en background" },
     ],
   },
   {
@@ -239,11 +250,11 @@ const SLIDES: Slide[] = [
     title: 'Formulaire de contact',
     subtitle: 'Capture de leads en salon',
     points: [
-      "Champs : société, interlocuteur, email, téléphone, notes",
-      "Secteurs (cases à cocher) : Pharmacie · Cosmétique · Emballage · Auto · Aéro · Électronique · Agri · Autre",
-      "Photo carte de visite via CameraX",
-      "Case à cocher consentement RGPD obligatoire",
-      "Layout responsive — colonne unique (mobile) · 2 colonnes (tablette)",
+      { text: "Champs : société, interlocuteur, email, téléphone, notes" },
+      { text: "Secteurs (cases à cocher) : Pharmacie · Cosmétique · Emballage · Auto · Aéro · Électronique · Agri · Autre" },
+      { text: "Photo carte de visite via CameraX" },
+      { text: "Case à cocher consentement RGPD obligatoire" },
+      { text: "Layout responsive — colonne unique (mobile) · 2 colonnes (tablette)" },
     ],
   },
   {
@@ -252,11 +263,11 @@ const SLIDES: Slide[] = [
     title: 'Capture photo',
     subtitle: 'CameraX 1.3.1',
     points: [
-      "CameraCapture.kt — composable réutilisable",
-      "Preview en direct + capture JPEG",
-      "Redimensionnement bitmap pour optimiser le stockage",
-      "Chemin stocké dans Contact.photoPath (Room)",
-      "Permission CAMERA déclarée dans le Manifest",
+      { text: "CameraCapture.kt — composable réutilisable" },
+      { text: "Preview en direct + capture JPEG" },
+      { text: "Redimensionnement bitmap pour optimiser le stockage" },
+      { text: "Chemin stocké dans Contact.photoPath (Room)" },
+      { text: "Permission CAMERA déclarée dans le Manifest" },
     ],
   },
   {
@@ -264,11 +275,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Conformité RGPD',
     points: [
-      "RGPDDialog.kt — dialogue de consentement explicite",
-      "Soumission du formulaire bloquée sans consentement coché",
-      "Données personnelles stockées uniquement en local (pas de cloud)",
-      "Export uniquement à la demande explicite de l'admin",
-      "Aucun tracking, aucune telemetry externe",
+      { text: "RGPDDialog.kt — dialogue de consentement explicite" },
+      { text: "Soumission du formulaire bloquée sans consentement coché" },
+      { text: "Données personnelles stockées uniquement en local (pas de cloud)" },
+      { text: "Export uniquement à la demande explicite de l'admin" },
+      { text: "Aucun tracking, aucune telemetry externe" },
     ],
   },
   {
@@ -276,11 +287,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Historique contacts',
     points: [
-      "Liste de tous les leads capturés avec statut (pending / sent)",
-      "ContactHistoryViewModel — Flow<List<Contact>> depuis Room",
-      "ContactDetailDialog — vue complète avec photo et secteurs",
-      "Tri par date de création (desc)",
-      "Indicateur visuel du statut d'envoi email",
+      { text: "Liste de tous les leads capturés avec statut (pending / sent)" },
+      { text: "ContactHistoryViewModel — Flow<List<Contact>> depuis Room" },
+      { text: "ContactDetailDialog — vue complète avec photo et secteurs" },
+      { text: "Tri par date de création (desc)" },
+      { text: "Indicateur visuel du statut d'envoi email" },
     ],
   },
   {
@@ -288,11 +299,11 @@ const SLIDES: Slide[] = [
     section: 'Fonctionnalités',
     title: 'Export des données',
     points: [
-      "Export CSV — fichier dans Documents, partageable via Intent",
-      "Export email — SMTP Jakarta Mail avec SSL/TLS",
-      "Pièce jointe PDF générée via Android PdfDocument API",
-      "Template HTML email pour présentation professionnelle",
-      "Configuration SMTP dans le panel admin (host, port, identifiants)",
+      { text: "Export CSV — fichier dans Documents, partageable via Intent" },
+      { text: "Export email — SMTP Jakarta Mail avec SSL/TLS" },
+      { text: "Pièce jointe PDF générée via Android PdfDocument API" },
+      { text: "Template HTML email pour présentation professionnelle" },
+      { text: "Configuration SMTP dans le panel admin (host, port, identifiants)" },
     ],
   },
   {
@@ -301,11 +312,11 @@ const SLIDES: Slide[] = [
     title: 'Panel administrateur',
     subtitle: 'Gestion de contenu sans redéploiement',
     points: [
-      "AdminLoginScreen — authentification par mot de passe",
-      "AdminModeBanner — indicateur visuel du mode admin actif",
-      "ContentManager.kt — édition inline de tous les textes de l'UI",
-      "TranslationService.kt — ML Kit pour traduction automatique",
-      "SMTP Config — SmtpConfigDialog pour configurer l'envoi email",
+      { text: "AdminLoginScreen — authentification par mot de passe" },
+      { text: "AdminModeBanner — indicateur visuel du mode admin actif" },
+      { text: "ContentManager.kt — édition inline de tous les textes de l'UI" },
+      { text: "TranslationService.kt — ML Kit pour traduction automatique" },
+      { text: "SMTP Config — SmtpConfigDialog pour configurer l'envoi email" },
     ],
   },
   {
@@ -314,11 +325,11 @@ const SLIDES: Slide[] = [
     title: 'Mode kiosque',
     subtitle: 'Présentation immersive en salon',
     points: [
-      "Fullscreen avec system bars masquées (WindowInsetsController)",
-      "FLAG_KEEP_SCREEN_ON — écran toujours allumé",
-      "Orientation paysage forcée (idéal tablette 10\")",
-      "Navigation limitée — pas de retour OS possible depuis la démo",
-      "Adapté à un usage sur stand sans surveillance constante",
+      { text: "Fullscreen avec system bars masquées (WindowInsetsController)" },
+      { text: "FLAG_KEEP_SCREEN_ON — écran toujours allumé" },
+      { text: "Orientation paysage forcée (idéal tablette 10\")" },
+      { text: "Navigation limitée — pas de retour OS possible depuis la démo" },
+      { text: "Adapté à un usage sur stand sans surveillance constante" },
     ],
   },
   {
@@ -327,11 +338,11 @@ const SLIDES: Slide[] = [
     title: 'Support multilingue',
     subtitle: 'ML Kit Translate — on-device',
     points: [
-      "ML Kit Translate 17.0.3 — traduction sans réseau",
-      "LanguageManager — gestion de la langue active",
-      "ContentManager — surcharge dynamique des chaînes",
-      "Localization.kt — système de chaînes localisées",
-      "Pas de connexion internet requise pour les traductions",
+      { text: "ML Kit Translate 17.0.3 — traduction sans réseau" },
+      { text: "LanguageManager — gestion de la langue active" },
+      { text: "ContentManager — surcharge dynamique des chaînes" },
+      { text: "Localization.kt — système de chaînes localisées" },
+      { text: "Pas de connexion internet requise pour les traductions" },
     ],
   },
 
@@ -342,11 +353,11 @@ const SLIDES: Slide[] = [
     title: 'Interface responsive',
     subtitle: 'Phone et tablette',
     points: [
-      "ScreenType enum — détection automatique phone / tablet",
-      "Dimensions.kt — espacements et tailles selon le form factor",
-      "Formulaire contact : colonne unique → 2 colonnes côte à côte",
-      "Catalogue : 2 colonnes → 3 colonnes ou plus",
-      "Testé sur émulateurs Pixel 6 et tablette 10\"",
+      { text: "ScreenType enum — détection automatique phone / tablet" },
+      { text: "Dimensions.kt — espacements et tailles selon le form factor" },
+      { text: "Formulaire contact : colonne unique → 2 colonnes côte à côte" },
+      { text: "Catalogue : 2 colonnes → 3 colonnes ou plus" },
+      { text: "Testé sur émulateurs Pixel 6 et tablette 10\"" },
     ],
   },
   {
@@ -354,11 +365,11 @@ const SLIDES: Slide[] = [
     section: 'Qualité',
     title: 'Sécurité',
     points: [
-      "Keystore signé (mon-app.jks) — APK release signé",
-      "AndroidX FileProvider — partage sécurisé sans exposer les chemins",
-      "Aucun secret hardcodé — SMTP via interface admin uniquement",
-      "ProGuard disponible en release (obfuscation du bytecode)",
-      "Permissions minimales déclarées dans le Manifest",
+      { text: "Keystore signé (mon-app.jks) — APK release signé" },
+      { text: "AndroidX FileProvider — partage sécurisé sans exposer les chemins" },
+      { text: "Aucun secret hardcodé — SMTP via interface admin uniquement" },
+      { text: "ProGuard disponible en release (obfuscation du bytecode)" },
+      { text: "Permissions minimales déclarées dans le Manifest" },
     ],
   },
   {
@@ -366,11 +377,11 @@ const SLIDES: Slide[] = [
     section: 'Qualité',
     title: 'Tests',
     points: [
-      "JUnit 4/5 — tests unitaires des ViewModels et Repositories",
-      "Mockk — mocking des interfaces Repository sans dépendance Room",
-      "Turbine — test des flux Kotlin Flow (émissions, completions)",
-      "Tests d'intégration Room — InstrumentedTest sur base en mémoire",
-      "Architecture Clean — chaque couche testable indépendamment",
+      { text: "JUnit 4/5 — tests unitaires des ViewModels et Repositories" },
+      { text: "Mockk — mocking des interfaces Repository sans dépendance Room" },
+      { text: "Turbine — test des flux Kotlin Flow (émissions, completions)" },
+      { text: "Tests d'intégration Room — InstrumentedTest sur base en mémoire" },
+      { text: "Architecture Clean — chaque couche testable indépendamment" },
     ],
   },
   {
@@ -378,11 +389,11 @@ const SLIDES: Slide[] = [
     section: 'Qualité',
     title: 'Performances',
     points: [
-      "Coil — cache mémoire + disque pour images, chargement lazy",
-      "Filament — rendu 3D GPU-accéléré, hors du thread principal",
-      "Kotlin Coroutines — toutes les I/O sur Dispatchers.IO",
-      "Room Flow — mises à jour UI réactives sans polling",
-      "Large heap activé pour la gestion des médias lourds",
+      { text: "Coil — cache mémoire + disque pour images, chargement lazy" },
+      { text: "Filament — rendu 3D GPU-accéléré, hors du thread principal" },
+      { text: "Kotlin Coroutines — toutes les I/O sur Dispatchers.IO" },
+      { text: "Room Flow — mises à jour UI réactives sans polling" },
+      { text: "Large heap activé pour la gestion des médias lourds" },
     ],
   },
 
@@ -393,11 +404,11 @@ const SLIDES: Slide[] = [
     title: 'Défi 1 — Médias lourds',
     subtitle: 'Images, vidéos, PDFs',
     points: [
-      "Problème : chargement lent",
-      "Solution : chargement async sur Dispatchers.IO + Coil pour images",
-      "Large heap (android:largeHeap=\"true\") pour Filament",
-      "Bitmap sampling (inSampleSize) pour réduire la mémoire photos",
-      "→ Résultat : aucun crash mémoire en utilisation salon",
+      { text: "Problème : chargement lent" },
+      { text: "Solution : chargement async sur Dispatchers.IO + Coil pour images" },
+      { text: "Large heap (android:largeHeap=\"true\") pour Filament" },
+      { text: "Bitmap sampling (inSampleSize) pour réduire la mémoire photos" },
+      { text: "→ Résultat : aucun crash mémoire en utilisation salon" },
     ],
   },
   {
@@ -406,11 +417,11 @@ const SLIDES: Slide[] = [
     title: 'Défi 2 — Offline-first',
     subtitle: 'Application 100% fonctionnelle sans réseau',
     points: [
-      "Problème : salons professionnels souvent sans WiFi fiable",
-      "Solution : Room SQLite comme source de vérité unique",
-      "Tous les médias copiés en stockage interne à l'installation",
-      "ML Kit Translate fonctionne on-device sans connexion",
-      "→ App entièrement utilisable hors ligne, même l'export CSV",
+      { text: "Problème : salons professionnels souvent sans WiFi fiable" },
+      { text: "Solution : Room SQLite comme source de vérité unique" },
+      { text: "Tous les médias copiés en stockage interne à l'installation" },
+      { text: "ML Kit Translate fonctionne on-device sans connexion" },
+      { text: "→ App entièrement utilisable hors ligne, même l'export CSV" },
     ],
   },
   {
@@ -418,11 +429,11 @@ const SLIDES: Slide[] = [
     section: 'Défis',
     title: 'Défi 3 — Email SMTP sur Android',
     points: [
-      "Problème : Android bloque les opérations réseau sur le main thread",
-      "Solution : EmailService.kt sur Dispatchers.IO via coroutine",
-      "Jakarta Mail (Angus Mail) — supporte SSL/TLS et authentification",
-      "Gestion des erreurs : timeout, auth failure, SSL handshake",
-      "→ Envoi fiable avec feedback utilisateur en cas d'erreur",
+      { text: "Problème : Android bloque les opérations réseau sur le main thread" },
+      { text: "Solution : EmailService.kt sur Dispatchers.IO via coroutine" },
+      { text: "Jakarta Mail (Angus Mail) — supporte SSL/TLS et authentification" },
+      { text: "Gestion des erreurs : timeout, auth failure, SSL handshake" },
+      { text: "→ Envoi fiable avec feedback utilisateur en cas d'erreur" },
     ],
   },
   {
@@ -430,11 +441,11 @@ const SLIDES: Slide[] = [
     section: 'Défis',
     title: 'Défi 4 — Multilingue dynamique',
     points: [
-      "Problème : les chaînes doivent être modifiables par l'admin",
-      "Solution : ContentManager stocke les overrides dans APP_SETTINGS",
-      "ML Kit Translate pour les traductions automatiques à la demande",
-      "LanguageManager centralise la langue active",
-      "→ Commerciaux peuvent adapter les textes sans développeur",
+      { text: "Problème : les chaînes doivent être modifiables par l'admin" },
+      { text: "Solution : ContentManager stocke les overrides dans APP_SETTINGS" },
+      { text: "ML Kit Translate pour les traductions automatiques à la demande" },
+      { text: "LanguageManager centralise la langue active" },
+      { text: "→ Commerciaux peuvent adapter les textes sans développeur" },
     ],
   },
 
@@ -445,11 +456,11 @@ const SLIDES: Slide[] = [
     title: 'Référentiel RNCP Niveau 6',
     subtitle: "Concepteur Développeur d'Applications Full Stack",
     points: [
-      "C1 — Analyser les besoins et concevoir l'architecture applicative",
-      "C2 — Développer des interfaces utilisateur adaptatives",
-      "C3 — Concevoir et exploiter une base de données",
-      "C4 — Développer des composants métier et services",
-      "C5 — Travailler en contexte professionnel agile",
+      { text: "C1 — Analyser les besoins et concevoir l'architecture applicative" },
+      { text: "C2 — Développer des interfaces utilisateur adaptatives" },
+      { text: "C3 — Concevoir et exploiter une base de données" },
+      { text: "C4 — Développer des composants métier et services" },
+      { text: "C5 — Travailler en contexte professionnel agile" },
     ],
   },
   {
@@ -457,11 +468,11 @@ const SLIDES: Slide[] = [
     section: 'Compétences',
     title: 'C1 — Architecture applicative',
     points: [
-      "Analyse du besoin métier → cahier des charges fonctionnel",
-      "Choix architecturaux justifiés : MVVM + Clean Architecture",
-      "Conception du schéma de base de données (5 entités, relations)",
-      "Diagramme de navigation (NavGraph, 9 écrans)",
-      "Choix des dépendances (Koin, Room, Filament) argumentés",
+      { text: "Analyse du besoin métier → cahier des charges fonctionnel" },
+      { text: "Choix architecturaux justifiés : MVVM + Clean Architecture" },
+      { text: "Conception du schéma de base de données (5 entités, relations)" },
+      { text: "Diagramme de navigation (NavGraph, 9 écrans)" },
+      { text: "Choix des dépendances (Koin, Room, Filament) argumentés" },
     ],
   },
   {
@@ -469,11 +480,11 @@ const SLIDES: Slide[] = [
     section: 'Compétences',
     title: 'C2 — Interfaces utilisateur',
     points: [
-      "Jetpack Compose + Material 3 — UI déclarative moderne",
-      "Composants réutilisables : SMPHeader, SMPNavigationBar, CameraCapture",
-      "Responsive design — phone / tablette avec ScreenType",
-      "Mode kiosque fullscreen avec gestion des system bars",
-      "Accessibilité : contrastes Material 3, sémantique Compose",
+      { text: "Jetpack Compose + Material 3 — UI déclarative moderne" },
+      { text: "Composants réutilisables : SMPHeader, SMPNavigationBar, CameraCapture" },
+      { text: "Responsive design — phone / tablette avec ScreenType" },
+      { text: "Mode kiosque fullscreen avec gestion des system bars" },
+      { text: "Accessibilité : contrastes Material 3, sémantique Compose" },
     ],
   },
   {
@@ -481,11 +492,11 @@ const SLIDES: Slide[] = [
     section: 'Compétences',
     title: 'C3 — Base de données',
     points: [
-      "Modélisation relationnelle : 5 entités, clés étrangères, cascade delete",
-      "Room ORM avec DAOs typés (ContactDao, ProductDao, etc.)",
-      "Requêtes Flow réactives — mises à jour UI automatiques",
-      "DatabaseSeeder — initialisation des données au premier lancement",
-      "Migrations Room pour les évolutions de schéma",
+      { text: "Modélisation relationnelle : 5 entités, clés étrangères, cascade delete" },
+      { text: "Room ORM avec DAOs typés (ContactDao, ProductDao, etc.)" },
+      { text: "Requêtes Flow réactives — mises à jour UI automatiques" },
+      { text: "DatabaseSeeder — initialisation des données au premier lancement" },
+      { text: "Migrations Room pour les évolutions de schéma" },
     ],
   },
   {
@@ -493,11 +504,11 @@ const SLIDES: Slide[] = [
     section: 'Compétences',
     title: 'C4 — Composants métier',
     points: [
-      "EmailService.kt — service SMTP avec génération PDF",
-      "TranslationService.kt — traduction ML Kit asynchrone",
-      "ContentManager.kt — gestion des contenus éditables",
-      "ExportViewModel — orchestration CSV + email",
-      "Pattern Repository — isolation de la logique d'accès aux données",
+      { text: "EmailService.kt — service SMTP avec génération PDF" },
+      { text: "TranslationService.kt — traduction ML Kit asynchrone" },
+      { text: "ContentManager.kt — gestion des contenus éditables" },
+      { text: "ExportViewModel — orchestration CSV + email" },
+      { text: "Pattern Repository — isolation de la logique d'accès aux données" },
     ],
   },
   {
@@ -505,11 +516,11 @@ const SLIDES: Slide[] = [
     section: 'Compétences',
     title: 'C5 — Contexte professionnel',
     points: [
-      "Travail en autonomie au sein de l'équipe IT de SMP Moules",
-      "Versioning Git avec branches feature / fix",
-      "Livraison d'APK signé et documenté (apk.md)",
-      "Communication avec les utilisateurs métier (commerciaux)",
-      "Documentation technique : README, CLAUDE.md, AGENTS.md",
+      { text: "Travail en autonomie au sein de l'équipe IT de SMP Moules" },
+      { text: "Versioning Git avec branches feature / fix" },
+      { text: "Livraison d'APK signé et documenté (apk.md)" },
+      { text: "Communication avec les utilisateurs métier (commerciaux)" },
+      { text: "Documentation technique : README, CLAUDE.md, AGENTS.md" },
     ],
   },
 
@@ -519,11 +530,11 @@ const SLIDES: Slide[] = [
     section: 'Bilan',
     title: 'Bilan technique',
     points: [
-      "Application Android production-ready, APK signé livré",
-      "Architecture propre — chaque couche testable et évolutive",
-      "Intégration de 10+ librairies Android majeures",
-      "Première expérience significative de développement mobile natif",
-      "Compréhension approfondie du cycle de vie Android",
+      { text: "Application Android production-ready, APK signé livré" },
+      { text: "Architecture propre — chaque couche testable et évolutive" },
+      { text: "Intégration de 10+ librairies Android majeures" },
+      { text: "Première expérience significative de développement mobile natif" },
+      { text: "Compréhension approfondie du cycle de vie Android" },
     ],
   },
   {
@@ -531,11 +542,11 @@ const SLIDES: Slide[] = [
     section: 'Bilan',
     title: 'Apport pour SMP Moules',
     points: [
-      "Remplacement des feuilles de prise de contact papier par une app interactive",
-      "Fini les cartes de visite perdues",
-      "Export automatique des contacts via email",
-      "Autonomie : les commerciaux mettent à jour les contenus eux-mêmes",
-      "Image moderne de l'entreprise lors des salons professionnels",
+      { text: "Remplacement des feuilles de prise de contact papier par une app interactive" },
+      { text: "Fini les cartes de visite perdues" },
+      { text: "Export automatique des contacts via email" },
+      { text: "Autonomie : les commerciaux mettent à jour les contenus eux-mêmes" },
+      { text: "Image moderne de l'entreprise lors des salons professionnels" },
     ],
   },
   {
@@ -543,11 +554,11 @@ const SLIDES: Slide[] = [
     section: 'Bilan',
     title: "Ce que j'ai appris",
     points: [
-      "Maîtrise de Kotlin et Jetpack Compose en contexte réel",
-      "Architecture logicielle : MVVM, Clean Architecture, DI",
-      "Gestion des APIs hardware Android (CameraX, Filament, Permissions)",
-      "Rigueur sur la sécurité des données (RGPD, Keystore)",
-      "Communication technique avec des parties prenantes non-développeurs",
+      { text: "Maîtrise de Kotlin et Jetpack Compose en contexte réel" },
+      { text: "Architecture logicielle : MVVM, Clean Architecture, DI" },
+      { text: "Gestion des APIs hardware Android (CameraX, Filament, Permissions)" },
+      { text: "Rigueur sur la sécurité des données (RGPD, Keystore)" },
+      { text: "Communication technique avec des parties prenantes non-développeurs" },
     ],
   },
   {
@@ -555,11 +566,11 @@ const SLIDES: Slide[] = [
     section: 'Bilan',
     title: 'Perspectives & évolutions',
     points: [
-      "Synchronisation cloud — backup des contacts sur serveur distant",
-      "Analyse des prospects — statistiques par secteur, par salon",
-      "Notifications push — rappels de suivi des leads non traités",
-      "Version iOS — React Native pour mutualiser le code métier",
-      "Mode hors ligne amélioré — sync différentielle au retour réseau",
+      { text: "Synchronisation cloud — backup des contacts sur serveur distant" },
+      { text: "Analyse des prospects — statistiques par secteur, par salon" },
+      { text: "Notifications push — rappels de suivi des leads non traités" },
+      { text: "Version iOS — React Native pour mutualiser le code métier" },
+      { text: "Mode hors ligne amélioré — sync différentielle au retour réseau" },
     ],
   },
 
@@ -569,23 +580,100 @@ const SLIDES: Slide[] = [
     section: 'Conclusion',
     title: 'Conclusion',
     points: [
-      "Application kiosque Android complète, livrée et utilisée en production",
-      "Architecture MVVM + Clean — maintenable, testable, évolutive",
-      "Stack moderne : Kotlin · Compose · Room · Koin · Filament · CameraX",
-      "Compétences RNCP niveau 6 couvertes de la conception à la livraison",
-      "→ Questions ?",
+      { text: "Application kiosque Android complète, livrée et utilisée en production" },
+      { text: "Architecture MVVM + Clean — maintenable, testable, évolutive" },
+      { text: "Stack moderne : Kotlin · Compose · Room · Koin · Filament · CameraX" },
+      { text: "Compétences RNCP niveau 6 couvertes de la conception à la livraison" },
+      { text: "→ Questions ?" },
     ],
   },
 ]
 
 const SECTIONS = [...new Set(SLIDES.map(s => s.section))]
 
-export default function Oral() {
-  const [current, setCurrent] = useState(0)
-  const total = SLIDES.length
+type Step =
+  | { kind: 'overview'; slideIndex: number }
+  | { kind: 'zoom'; slideIndex: number; pointIndex: number }
 
-  const prev = useCallback(() => setCurrent(i => Math.max(0, i - 1)), [])
-  const next = useCallback(() => setCurrent(i => Math.min(total - 1, i + 1)), [total])
+export function generateSteps(slides: Slide[]): Step[] {
+  return slides.flatMap((slide, slideIndex) => [
+    { kind: 'overview' as const, slideIndex },
+    ...slide.points.map((_, pointIndex) => ({
+      kind: 'zoom' as const,
+      slideIndex,
+      pointIndex,
+    })),
+  ])
+}
+
+export const STEPS = generateSteps(SLIDES)
+
+interface ZoomSlideProps {
+  slide: Slide
+  pointIndex: number
+}
+
+function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
+  const point = slide.points[pointIndex]
+  const hasMedia = !!(point.image || point.video)
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center gap-3 mb-10">
+        <p className="font-mono text-xs text-[#e8ff00] uppercase tracking-widest">{slide.section}</p>
+        <span className="text-zinc-600 font-mono text-xs">·</span>
+        <p className="text-zinc-400 text-sm truncate">{slide.title}</p>
+        <span className="ml-auto font-mono text-xs text-zinc-500 shrink-0">
+          {String(pointIndex + 1).padStart(2, '0')} / {String(slide.points.length).padStart(2, '0')}
+        </span>
+      </div>
+
+      {hasMedia ? (
+        <div className="grid grid-cols-2 gap-10 items-center">
+          <div className="flex items-center justify-center">
+            {point.image && (
+              <img
+                src={point.image}
+                alt={point.text}
+                className="max-h-[60vh] w-full object-contain rounded-lg"
+              />
+            )}
+            {point.video && (
+              <video
+                src={point.video}
+                controls
+                className="max-h-[60vh] w-full rounded-lg"
+              />
+            )}
+          </div>
+          <div className="flex flex-col gap-5">
+            <p className="text-2xl font-semibold text-zinc-100 leading-snug">{point.text}</p>
+            {point.detail && (
+              <p className="text-zinc-400 text-lg leading-relaxed">{point.detail}</p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center text-center gap-6 min-h-[40vh]">
+          <p className="text-3xl font-semibold text-zinc-100 leading-snug max-w-2xl">{point.text}</p>
+          {point.detail && (
+            <p className="text-zinc-400 text-xl leading-relaxed max-w-xl">{point.detail}</p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function Oral() {
+  const [stepIndex, setStepIndex] = useState(0)
+
+  const prev = useCallback(() => setStepIndex(i => Math.max(0, i - 1)), [])
+  const next = useCallback(() => setStepIndex(i => Math.min(STEPS.length - 1, i + 1)), [])
+
+  const step = STEPS[stepIndex]
+  const slide = SLIDES[step.slideIndex]
+  const sectionIndex = SECTIONS.indexOf(slide.section)
 
   useEffect(() => {
     document.body.dataset.oral = 'true'
@@ -601,9 +689,6 @@ export default function Oral() {
     return () => window.removeEventListener('keydown', onKey)
   }, [prev, next])
 
-  const slide = SLIDES[current]
-  const sectionIndex = SECTIONS.indexOf(slide.section)
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col">
       {/* Top bar */} 
@@ -617,8 +702,13 @@ export default function Oral() {
             {SECTIONS.map((s, i) => (
               <button
                 key={s}
-                onClick={() => setCurrent(SLIDES.findIndex(sl => sl.section === s))}
+                onClick={() => {
+                  const slideIdx = SLIDES.findIndex(sl => sl.section === s)
+                  const targetStep = STEPS.findIndex(st => st.slideIndex === slideIdx && st.kind === 'overview')
+                  if (targetStep !== -1) setStepIndex(targetStep)
+                }}
                 title={s}
+                aria-label={s}
                 className={`px-2 py-0.5 font-mono text-[10px] rounded transition-all duration-300 ${
                   i === sectionIndex
                     ? 'bg-[#e8ff00] text-zinc-950 font-bold'
@@ -630,13 +720,13 @@ export default function Oral() {
             ))}
           </div>
           <span className="font-mono text-xs text-zinc-500">
-            {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+            {String(step.slideIndex + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
           </span>
         </div>
         <nav className="flex gap-2">
           <button
             onClick={prev}
-            disabled={current === 0}
+            disabled={stepIndex === 0}
             aria-label="Diapositive précédente"
             className="px-3 py-1.5 font-mono text-xs border border-zinc-800 rounded hover:border-[#e8ff00] hover:text-[#e8ff00] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
@@ -644,7 +734,7 @@ export default function Oral() {
           </button>
           <button
             onClick={next}
-            disabled={current === total - 1}
+            disabled={stepIndex === STEPS.length - 1}
             aria-label="Diapositive suivante"
             className="px-3 py-1.5 font-mono text-xs border border-zinc-800 rounded hover:border-[#e8ff00] hover:text-[#e8ff00] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
@@ -655,24 +745,33 @@ export default function Oral() {
 
       {/* Slide content */}
       <main className="flex-1 flex items-center justify-center pt-24 pb-16 px-8 lg:px-24">
-        <div key={slide.id} className="w-full max-w-3xl slide-enter">
-          <p className="font-mono text-xs text-[#e8ff00] mb-6 uppercase tracking-widest">
-            {slide.section}
-          </p>
-          <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
-            {slide.title}
-          </h1>
-          {slide.subtitle && (
-            <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
+        <div
+          key={`${step.slideIndex}-${step.kind}-${step.kind === 'zoom' ? step.pointIndex : ''}`}
+          className={`w-full slide-enter ${step.kind === 'overview' ? 'max-w-3xl' : 'max-w-5xl'}`}
+        >
+          {step.kind === 'overview' ? (
+            <>
+              <p className="font-mono text-xs text-[#e8ff00] mb-6 uppercase tracking-widest">
+                {slide.section}
+              </p>
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
+                {slide.title}
+              </h1>
+              {slide.subtitle && (
+                <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
+              )}
+              <ul className="space-y-4 mt-8">
+                {slide.points.map(point => (
+                  <li key={point.text} className="flex items-start gap-4 text-zinc-300 text-lg">
+                    <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
+                    <span>{point.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <ZoomSlide slide={slide} pointIndex={step.pointIndex} />
           )}
-          <ul className="space-y-4 mt-8">
-            {slide.points.map(point => (
-              <li key={point} className="flex items-start gap-4 text-zinc-300 text-lg">
-                <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </main>
 
@@ -680,7 +779,7 @@ export default function Oral() {
       <div className="fixed bottom-0 left-0 right-0 h-0.5 bg-zinc-800/60">
         <div
           className="h-full bg-[#e8ff00] transition-all duration-500 ease-out"
-          style={{ width: `${((current + 1) / total) * 100}%` }}
+          style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
         />
       </div>
     </div>

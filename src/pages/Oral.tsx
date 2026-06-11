@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+interface SlidePoint {
+  text: string
+  detail?: string
+  image?: string
+  video?: string
+}
+
 interface Slide {
   id: string
   section: string
   title: string
   subtitle?: string
-  points: string[]
+  points: SlidePoint[]
 }
 
 const SLIDES: Slide[] = [

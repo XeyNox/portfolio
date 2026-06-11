@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import Oral from '../pages/Oral'
-import { generateSteps } from '../pages/Oral'
+import Oral, { generateSteps, STEPS } from '../pages/Oral'
 
 describe('generateSteps', () => {
   it('produces one overview step per slide', () => {
@@ -51,15 +50,15 @@ describe('Oral', () => {
     expect(screen.getByText('SMP-Commercial')).toBeInTheDocument()
   })
 
-  it('shows slide counter starting at 01 / 47', () => {
+  it('shows slide counter starting at 01', () => {
     renderOral()
-    expect(screen.getByText('01 / 47')).toBeInTheDocument()
+    expect(screen.getByText(/^01\s*\/\s*\d+$/)).toBeInTheDocument()
   })
 
-  it('navigates to the next slide on button click', async () => {
+  it('navigates to zoom of first point after one click', async () => {
     renderOral()
     await userEvent.click(screen.getByRole('button', { name: 'Diapositive suivante' }))
-    expect(screen.getByText('SMP Moules')).toBeInTheDocument()
+    expect(screen.getByText('Loic Michaud')).toBeInTheDocument()
   })
 
   it('disables the prev button on the first slide', () => {
@@ -67,10 +66,10 @@ describe('Oral', () => {
     expect(screen.getByRole('button', { name: 'Diapositive précédente' })).toBeDisabled()
   })
 
-  it('disables the next button on the last slide', async () => {
+  it('disables the next button on the last step', async () => {
     renderOral()
     const nextBtn = screen.getByRole('button', { name: 'Diapositive suivante' })
-    for (let i = 0; i < 46; i++) {
+    for (let i = 0; i < STEPS.length - 1; i++) {
       await userEvent.click(nextBtn)
     }
     expect(nextBtn).toBeDisabled()

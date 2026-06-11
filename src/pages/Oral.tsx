@@ -634,7 +634,7 @@ function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
             {point.image && (
               <img
                 src={point.image}
-                alt=""
+                alt={point.text}
                 className="max-h-[60vh] w-full object-contain rounded-lg"
               />
             )}

@@ -591,6 +591,23 @@ const SLIDES: Slide[] = [
 
 const SECTIONS = [...new Set(SLIDES.map(s => s.section))]
 
+type Step =
+  | { kind: 'overview'; slideIndex: number }
+  | { kind: 'zoom'; slideIndex: number; pointIndex: number }
+
+export function generateSteps(slides: Slide[]): Step[] {
+  return slides.flatMap((slide, slideIndex) => [
+    { kind: 'overview' as const, slideIndex },
+    ...slide.points.map((_, pointIndex) => ({
+      kind: 'zoom' as const,
+      slideIndex,
+      pointIndex,
+    })),
+  ])
+}
+
+export const STEPS = generateSteps(SLIDES)
+
 export default function Oral() {
   const [current, setCurrent] = useState(0)
   const total = SLIDES.length

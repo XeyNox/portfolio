@@ -3,6 +3,39 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Oral from '../pages/Oral'
+import { generateSteps } from '../pages/Oral'
+
+describe('generateSteps', () => {
+  it('produces one overview step per slide', () => {
+    const slides = [
+      { id: 'a', section: 'S', title: 'T', points: [{ text: 'p1' }, { text: 'p2' }] },
+      { id: 'b', section: 'S', title: 'T2', points: [{ text: 'p3' }] },
+    ]
+    const steps = generateSteps(slides)
+    const overviews = steps.filter(s => s.kind === 'overview')
+    expect(overviews).toHaveLength(2)
+  })
+
+  it('produces one zoom step per point', () => {
+    const slides = [
+      { id: 'a', section: 'S', title: 'T', points: [{ text: 'p1' }, { text: 'p2' }] },
+      { id: 'b', section: 'S', title: 'T2', points: [{ text: 'p3' }] },
+    ]
+    const steps = generateSteps(slides)
+    const zooms = steps.filter(s => s.kind === 'zoom')
+    expect(zooms).toHaveLength(3)
+  })
+
+  it('orders overview before its zoom steps', () => {
+    const slides = [
+      { id: 'a', section: 'S', title: 'T', points: [{ text: 'p1' }, { text: 'p2' }] },
+    ]
+    const steps = generateSteps(slides)
+    expect(steps[0]).toMatchObject({ kind: 'overview', slideIndex: 0 })
+    expect(steps[1]).toMatchObject({ kind: 'zoom', slideIndex: 0, pointIndex: 0 })
+    expect(steps[2]).toMatchObject({ kind: 'zoom', slideIndex: 0, pointIndex: 1 })
+  })
+})
 
 function renderOral() {
   return render(

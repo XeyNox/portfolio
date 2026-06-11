@@ -666,11 +666,14 @@ function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
 }
 
 export default function Oral() {
-  const [current, setCurrent] = useState(0)
-  const total = SLIDES.length
+  const [stepIndex, setStepIndex] = useState(0)
 
-  const prev = useCallback(() => setCurrent(i => Math.max(0, i - 1)), [])
-  const next = useCallback(() => setCurrent(i => Math.min(total - 1, i + 1)), [total])
+  const prev = useCallback(() => setStepIndex(i => Math.max(0, i - 1)), [])
+  const next = useCallback(() => setStepIndex(i => Math.min(STEPS.length - 1, i + 1)), [])
+
+  const step = STEPS[stepIndex]
+  const slide = SLIDES[step.slideIndex]
+  const sectionIndex = SECTIONS.indexOf(slide.section)
 
   useEffect(() => {
     document.body.dataset.oral = 'true'
@@ -686,9 +689,6 @@ export default function Oral() {
     return () => window.removeEventListener('keydown', onKey)
   }, [prev, next])
 
-  const slide = SLIDES[current]
-  const sectionIndex = SECTIONS.indexOf(slide.section)
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col">
       {/* Top bar */} 
@@ -702,7 +702,11 @@ export default function Oral() {
             {SECTIONS.map((s, i) => (
               <button
                 key={s}
-                onClick={() => setCurrent(SLIDES.findIndex(sl => sl.section === s))}
+                onClick={() => {
+                  const slideIdx = SLIDES.findIndex(sl => sl.section === s)
+                  const targetStep = STEPS.findIndex(st => st.slideIndex === slideIdx && st.kind === 'overview')
+                  setStepIndex(targetStep)
+                }}
                 title={s}
                 className={`px-2 py-0.5 font-mono text-[10px] rounded transition-all duration-300 ${
                   i === sectionIndex
@@ -715,13 +719,13 @@ export default function Oral() {
             ))}
           </div>
           <span className="font-mono text-xs text-zinc-500">
-            {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+            {String(step.slideIndex + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
           </span>
         </div>
         <nav className="flex gap-2">
           <button
             onClick={prev}
-            disabled={current === 0}
+            disabled={stepIndex === 0}
             aria-label="Diapositive précédente"
             className="px-3 py-1.5 font-mono text-xs border border-zinc-800 rounded hover:border-[#e8ff00] hover:text-[#e8ff00] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
@@ -729,7 +733,7 @@ export default function Oral() {
           </button>
           <button
             onClick={next}
-            disabled={current === total - 1}
+            disabled={stepIndex === STEPS.length - 1}
             aria-label="Diapositive suivante"
             className="px-3 py-1.5 font-mono text-xs border border-zinc-800 rounded hover:border-[#e8ff00] hover:text-[#e8ff00] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
@@ -740,24 +744,33 @@ export default function Oral() {
 
       {/* Slide content */}
       <main className="flex-1 flex items-center justify-center pt-24 pb-16 px-8 lg:px-24">
-        <div key={slide.id} className="w-full max-w-3xl slide-enter">
-          <p className="font-mono text-xs text-[#e8ff00] mb-6 uppercase tracking-widest">
-            {slide.section}
-          </p>
-          <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
-            {slide.title}
-          </h1>
-          {slide.subtitle && (
-            <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
+        <div
+          key={`${step.slideIndex}-${step.kind}-${step.kind === 'zoom' ? step.pointIndex : ''}`}
+          className={`w-full slide-enter ${step.kind === 'overview' ? 'max-w-3xl' : 'max-w-5xl'}`}
+        >
+          {step.kind === 'overview' ? (
+            <>
+              <p className="font-mono text-xs text-[#e8ff00] mb-6 uppercase tracking-widest">
+                {slide.section}
+              </p>
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-tight mb-4">
+                {slide.title}
+              </h1>
+              {slide.subtitle && (
+                <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>
+              )}
+              <ul className="space-y-4 mt-8">
+                {slide.points.map(point => (
+                  <li key={point.text} className="flex items-start gap-4 text-zinc-300 text-lg">
+                    <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
+                    <span>{point.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <ZoomSlide slide={slide} pointIndex={step.pointIndex} />
           )}
-          <ul className="space-y-4 mt-8">
-            {slide.points.map(point => (
-              <li key={point.text} className="flex items-start gap-4 text-zinc-300 text-lg">
-                <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
-                <span>{point.text}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </main>
 
@@ -765,7 +778,7 @@ export default function Oral() {
       <div className="fixed bottom-0 left-0 right-0 h-0.5 bg-zinc-800/60">
         <div
           className="h-full bg-[#e8ff00] transition-all duration-500 ease-out"
-          style={{ width: `${((current + 1) / total) * 100}%` }}
+          style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
         />
       </div>
     </div>

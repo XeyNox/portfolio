@@ -47,7 +47,7 @@ const SLIDES: Slide[] = [
     title: 'Problématique métier',
     subtitle: 'Pourquoi ce projet ?',
     points: [
-      { text: "Les commerciaux présentaient les produits sous format physique  " },
+      { text: "Les commerciaux présentaient les produits sous format physique" },
       { text: "Aucune capture structurée des contacts prospects en salon" },
       { text: "Impossibilité de montrer des vidéos produit" },
       { text: "Objectif : une application kiosque interactive, offline, sur tablette Android" },
@@ -705,9 +705,10 @@ export default function Oral() {
                 onClick={() => {
                   const slideIdx = SLIDES.findIndex(sl => sl.section === s)
                   const targetStep = STEPS.findIndex(st => st.slideIndex === slideIdx && st.kind === 'overview')
-                  setStepIndex(targetStep)
+                  if (targetStep !== -1) setStepIndex(targetStep)
                 }}
                 title={s}
+                aria-label={s}
                 className={`px-2 py-0.5 font-mono text-[10px] rounded transition-all duration-300 ${
                   i === sectionIndex
                     ? 'bg-[#e8ff00] text-zinc-950 font-bold'

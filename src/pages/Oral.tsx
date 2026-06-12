@@ -174,6 +174,30 @@ const SLIDES: Slide[] = [
   },
 
   {
+    id: 'evolution-ui',
+    section: 'Conception',
+    title: "Évolution de l'interface",
+    subtitle: 'Wireframe → app finale : ce que les retours utilisateurs ont changé',
+    points: [
+      {
+        text: "Accueil — d'une navigation simple à un écran de marque complet",
+        detail: "La wireframe ne montrait pas d'écran d'accueil — juste la navigation. Après les premières démos avec les commerciaux, le besoin est apparu : présenter SMP avant tout. Résultat : branding, 4 chiffres clés (50+ ans, 1000+ moules, 3 secteurs, 100% Made in France), photo des locaux et frise historique 1972–2024.",
+        image: '/oral/figma/app-accueil.jpg',
+      },
+      {
+        text: "Catalogue — grille de placeholders → recherche + tags + cards riches",
+        detail: "Wireframe : grille de cards grises sans contenu. App finale : barre de recherche full-text, tags filtrables par secteur (PET, PP, cosmétique, emballage…), cards avec icône, nom de catégorie, description et bouton CTA. Ajout demandé après retour : les commerciaux voulaient filtrer rapidement par secteur client.",
+        image: '/oral/figma/app-catalogue.jpg',
+      },
+      {
+        text: "Contact — absent de la wireframe initiale, entièrement conçu en itération",
+        detail: "Le formulaire de contact n'était pas maquetté dans Figma. Il a été conçu directement en code après les premières discussions sur le terrain. Layout 2 colonnes responsive (champs à gauche, capture photo CameraX à droite), 8 secteurs à cocher, zone notes, case RGPD obligatoire avant le bouton Enregistrer.",
+        image: '/oral/figma/app-contact.jpg',
+      },
+    ],
+  },
+
+  {
     id: 'architecture',
     section: 'Conception',
     title: 'Architecture MVVM + Clean',

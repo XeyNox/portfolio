@@ -8,12 +8,11 @@ export function useScramble(target: string, delay = 400) {
 
   useEffect(() => {
     let frame = 0
-    let timeout: ReturnType<typeof setTimeout>
     let interval: ReturnType<typeof setInterval>
     const totalFrames = 24
     const revealAt = Math.floor(totalFrames / target.length)
 
-    timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       interval = setInterval(() => {
         frame++
         const revealed = Math.floor(frame / revealAt)

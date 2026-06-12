@@ -450,7 +450,121 @@ const SLIDES: Slide[] = [
     ],
   },
 
-  // ── 7. COMPÉTENCES RNCP ───────────────────────────────────────────────────
+  // ── 7. INSIGHTS TECHNIQUES ───────────────────────────────────────────────
+  {
+    id: 'room-reactive',
+    section: 'Insights',
+    title: 'Room : Flow réactif vs one-shot',
+    subtitle: 'Ce que les docs ne montrent pas',
+    points: [
+      {
+        text: 'fun getAllContacts(): Flow<List<Contact>> — requête réactive',
+        detail: "Room observe la table via un trigger SQLite interne. Chaque INSERT/UPDATE/DELETE re-émet automatiquement une nouvelle liste. L'UI se met à jour sans polling, sans callback manuel — la réactivité est dans le type de retour.",
+      },
+      {
+        text: 'suspend fun getById(id: Long): Contact? — requête one-shot',
+        detail: "Une suspend fun s'exécute une fois et retourne. Pour la lecture unique (détail d'un produit), c'est le bon choix — pas de collector à gérer. Pour une liste qui doit rester synchronisée, il faut Flow.",
+      },
+      {
+        text: 'val id: Long = 0 — valeur sentinelle Room',
+        detail: "Room utilise 0 comme valeur sentinelle à l'insertion : si id == 0, autoGenerate génère un id. Si id != 0, Room tente d'insérer avec cet id. Ce n'est pas écrit clairement dans la doc — ça fait crasher si on insère un Contact avec un id hardcodé.",
+      },
+      {
+        text: 'sentAt: Long? plutôt que Date — Room et les types complexes',
+        detail: "Room ne sait pas sérialiser java.util.Date nativement. Il faut soit un @TypeConverter (classe séparée, boilerplate), soit rester sur des primitives. Long (timestamp Unix ms) est lisible, portable, triable en SQL — meilleur choix ici.",
+      },
+      {
+        text: '→ Le type de retour du DAO définit le comportement réactif',
+        detail: 'Flow<T> = la requête reste active et re-émet. suspend T = une exécution, un résultat. Ce n\'est pas une préférence stylistique — c\'est une décision architecturale qui impacte la façon dont l\'UI se synchronise avec la base.',
+      },
+    ],
+  },
+  {
+    id: 'coroutines-pratique',
+    section: 'Insights',
+    title: 'Coroutines : withContext vs launch',
+    subtitle: 'La différence que les tutos ne précisent pas',
+    points: [
+      {
+        text: 'withContext(Dispatchers.IO) — switch de thread, résultat attendu',
+        detail: "withContext suspend la coroutine courante, exécute le bloc sur Dispatchers.IO, puis reprend sur le dispatcher d'origine avec le résultat. C'est un switch de contexte — la coroutine parente attend la fin. Utilisé dans EmailService pour l'envoi SMTP.",
+      },
+      {
+        text: 'launch(Dispatchers.IO) — nouvelle coroutine indépendante, résultat ignoré',
+        detail: "launch crée un nouveau Job indépendant. La coroutine parente continue immédiatement sans attendre. Utile pour fire-and-forget. Mauvais choix si on a besoin du résultat — on ne peut pas 'await' un launch sans Deferred.",
+      },
+      {
+        text: 'viewModelScope.launch — survit aux rotations d\'écran',
+        detail: "viewModelScope est lié au ViewModel, pas à l'Activity. L'envoi email lancé dans viewModelScope continue si l'utilisateur tourne la tablette — le ViewModel survit à la rotation. lifecycleScope se cancelle avec l'Activity.",
+      },
+      {
+        text: 'Dispatchers.IO — pool de threads pour les opérations bloquantes',
+        detail: "Dispatchers.IO maintient un pool de 64 threads max. Idéal pour Room, Jakarta Mail, FileIO. Dispatchers.Main = thread UI Android. Tout appel bloquant sur Main = ANR (Application Not Responding) — Android tue l'app après 5 secondes.",
+      },
+      {
+        text: '→ Règle simple : I/O bloquant → withContext(Dispatchers.IO) dans une suspend fun',
+        detail: "La signature suspend fun sendContacts() = withContext(Dispatchers.IO) { ... } est le pattern idiomatique : la fonction s'auto-distribue sur le bon dispatcher, l'appelant n'a pas à se soucier du thread. C'est la convention recommandée par les guidelines Kotlin.",
+      },
+    ],
+  },
+  {
+    id: 'koin-scoping',
+    section: 'Insights',
+    title: 'Koin : durée de vie des dépendances',
+    subtitle: 'single · factory · viewModel — le mauvais choix = bug silencieux',
+    points: [
+      {
+        text: 'single { } — une seule instance pour toute l\'app',
+        detail: "ContactRepository, AppDatabase, EmailService sont déclarés single. Ils sont créés au premier get() et réutilisés partout. Utiliser single pour un ViewModel = mémoire partagée entre écrans, état qui persiste après navigation — bug subtil.",
+      },
+      {
+        text: 'factory { } — nouvelle instance à chaque injection',
+        detail: "factory crée un nouvel objet à chaque appel get(). Utiliser factory pour un Repository = une nouvelle connexion Room à chaque ViewModel = gaspillage de ressources et cache in-memory systématiquement vide.",
+      },
+      {
+        text: 'viewModel { } — lié au cycle de vie Android ViewModel',
+        detail: "viewModel { ContactHistoryViewModel(get(), get()) } crée le ViewModel via Koin et le lie au ViewModelStore Android. Il survit aux rotations mais est détruit quand l'utilisateur quitte définitivement l'écran.",
+      },
+      {
+        text: '→ Erreur classique : déclarer un ViewModel en single',
+        detail: "Un ViewModel en single est partagé entre tous les écrans et n'est jamais détruit — fuite mémoire assurée. Le StateFlow continue d'émettre, les coroutines tournent en arrière-plan. Koin ne lève pas d'erreur : il faut connaître la sémantique de chaque scope.",
+      },
+      {
+        text: '→ Erreur classique 2 : déclarer un Repository en factory',
+        detail: "Un Repository en factory = une nouvelle instance injectée dans chaque ViewModel. Si le Repository maintient un cache en mémoire, chaque ViewModel voit son propre cache vide. Room n'est pas affecté (base commune), mais tout état in-memory est dupliqué.",
+      },
+    ],
+  },
+  {
+    id: 'stateflow-livedata',
+    section: 'Insights',
+    title: 'StateFlow vs LiveData',
+    subtitle: 'Pourquoi StateFlow en 2025',
+    points: [
+      {
+        text: 'LiveData — lifecycle-aware mais dépendante d\'Android',
+        detail: "LiveData observe le lifecycle automatiquement. Mais elle importe androidx.lifecycle dans le ViewModel — rendant le ViewModel dépendant d'Android, moins testable en JVM pur (besoin de InstantTaskExecutorRule en test).",
+      },
+      {
+        text: 'StateFlow — coroutine-native, testable en JVM pur',
+        detail: "StateFlow fait partie de kotlinx-coroutines — pas de dépendance Android. Le ViewModel est testable sans émulateur, sans règle JUnit spéciale. runTest gère le temps des coroutines, collectAsStateWithLifecycle() gère le lifecycle côté Compose.",
+      },
+      {
+        text: 'StateFlow a toujours une valeur initiale',
+        detail: "MutableStateFlow(initialValue) requiert une valeur à la création — impossible d'avoir un état null non-intentionnel. LiveData.value est nullable par défaut et peut rester null jusqu'au premier post — source de NullPointerException en UI.",
+      },
+      {
+        text: 'collectAsStateWithLifecycle() — lifecycle à la frontière UI seulement',
+        detail: "collectAsStateWithLifecycle() arrête la collection quand le composable quitte le cycle de vie actif. Contrairement à collectAsState() qui continue de collecter même en background — gaspillage CPU/batterie sur une tablette 24h allumée.",
+      },
+      {
+        text: '→ StateFlow dans le ViewModel, collectAsStateWithLifecycle() dans Compose',
+        detail: "Ce pattern garde le ViewModel libre de toute dépendance Android et délègue la gestion lifecycle au composable. C'est la recommandation officielle Google depuis Android Summit 2022 — et ce que ce projet applique sur tous les écrans.",
+      },
+    ],
+  },
+
+  // ── 8. COMPÉTENCES RNCP (was 7) ──────────────────────────────────────────
   {
     id: 'rncp-intro',
     section: 'Compétences',

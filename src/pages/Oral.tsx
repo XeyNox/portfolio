@@ -67,6 +67,35 @@ const SLIDES: Slide[] = [
     ],
   },
 
+  {
+    id: 'cdc-objectifs',
+    section: 'Introduction',
+    title: 'Cahier des charges',
+    subtitle: 'Les 5 objectifs définis en amont',
+    points: [
+      {
+        text: 'Prise de contacts clients — formulaire + envoi email différé',
+        detail: "Saisir société, interlocuteur, email, téléphone, secteur et notes. L'envoi email est différé si hors ligne — les contacts sont sauvegardés localement et envoyés dès la reconnexion.",
+      },
+      {
+        text: 'Présentation de SMP — films, photos, informations entreprise',
+        detail: "Écran d'accueil avec branding SMP, diffusion de vidéos de présentation et de photos de l'entreprise. Tout le contenu stocké localement pour une disponibilité 100% sur stand.",
+      },
+      {
+        text: 'Catalogue de réalisations — moules avec photos, vidéos, plans 2D/3D',
+        detail: 'Navigation par catégories (cosmétique, pharmacie, emballage…), fiches produits avec galerie photos, vidéos de démonstration, visualisation de modèles 3D et plans PDF.',
+      },
+      {
+        text: 'Mise à jour simplifiée — gestion des contenus sans redéploiement',
+        detail: "Initialement prévu via un dossier partagé SMB depuis un ordinateur. Devenu un panel admin intégré directement dans l'application — voir slide suivante.",
+      },
+      {
+        text: 'Fonctionnement hors ligne — PRIORITÉ ABSOLUE',
+        detail: '"Toute l\'application doit fonctionner parfaitement sans connexion. Aucun écran de chargement infini ou d\'erreur réseau." — verbatim du cahier des charges. Tous les contenus synchronisés, toutes les saisies de contacts, toutes les consultations : 100% offline.',
+      },
+    ],
+  },
+
   // ── 2. ANALYSE & CONCEPTION ───────────────────────────────────────────────
   {
     id: 'choix-plateforme',
@@ -81,6 +110,93 @@ const SLIDES: Slide[] = [
       { text: "→ Choix : Android natif Kotlin + Compose Material 3", detail: "Ce choix garantit les meilleures performances hardware, une UI moderne Material 3 et une architecture propre MVVM — idéal pour un projet livré en production sur tablette." },
     ],
   },
+  {
+    id: 'cdc-pivots',
+    section: 'Conception',
+    title: 'Du CDC à la livraison',
+    subtitle: 'Ce qui a évolué — et pourquoi',
+    points: [
+      {
+        text: 'UI : XML Views + Material 3 → Jetpack Compose',
+        detail: 'Le CDC recommandait XML Views, solution stable et documentée. Compose a été adopté pour son UI déclarative, ses recompositions réactives aux StateFlow et sa cohérence avec les guidelines Google 2025. Résultat : zéro boilerplate XML, composants réutilisables.',
+      },
+      {
+        text: 'Sync contenus : dossier partagé SMB → panel admin intégré',
+        detail: "Le CDC prévoyait une synchronisation depuis un dossier réseau SMB (jcifs-ng). Cette architecture nécessitait un ordinateur sur le même réseau local. Le panel admin directement dans l'app répond au même besoin sans aucune infrastructure réseau — plus robuste pour une utilisation en salon.",
+      },
+      {
+        text: 'State management : LiveData → StateFlow + Coroutines',
+        detail: "Le CDC citait LiveData, solution officielle Jetpack de l'époque. StateFlow a été préféré : pas de dépendance Android dans le ViewModel, testable en JVM pur sans InstantTaskExecutorRule, et cohérent avec l'ensemble de l'architecture coroutines du projet.",
+      },
+      {
+        text: 'Email : WorkManager + file d\'attente → SMTP direct sur Dispatchers.IO',
+        detail: "Le CDC planifiait WorkManager pour gérer une file d'attente d'emails différés avec reprise automatique. Jakarta Mail sur Dispatchers.IO avec feedback immédiat à l'admin s'est avéré plus simple, plus direct et plus transparent — l'admin voit le résultat en temps réel.",
+      },
+      {
+        text: '→ Le CDC posait les bases, l\'implémentation a affiné chaque choix',
+        detail: "Chaque pivot répond à une contrainte découverte pendant le développement : complexité d'infrastructure, testabilité, cohérence architecturale. La spec initiale était solide — les évolutions l'ont rendue plus pragmatique.",
+      },
+    ],
+  },
+
+  {
+    id: 'maquettes',
+    section: 'Conception',
+    title: 'Maquettes Figma',
+    subtitle: 'Wireframes haute fidélité validés avant développement',
+    points: [
+      {
+        text: 'Navigation principale — 4 onglets + header SMP',
+        detail: "Barre de navigation fixe en haut avec les 4 sections : Accueil, Contact, Catalogue, Présentation. L'onglet actif est mis en surbrillance en rouge (couleur SMP). Header avec logo, mention RGPD et accès paramètres — structure reprise telle quelle dans l'app finale.",
+        image: '/oral/figma/wireframe-catalogue.png',
+      },
+      {
+        text: 'Catalogue — grille de produits avec cards arrondies',
+        detail: "Grille 4 colonnes de cards produits avec coins arrondis et image de couverture. La première card montre un exemple réel (pompe cosmétique). Les autres sont des placeholders — l'admin peuple la grille sans recompiler.",
+        image: '/oral/figma/wireframe-catalogue.png',
+      },
+      {
+        text: 'Détail produit — tabs Photos · Modèle 3D · Plans · Vidéo',
+        detail: "Chaque fiche produit est organisée en 4 onglets. Le tab actif est mis en rouge. La zone centrale est dédiée au rendu du média sélectionné : viewer Filament 3D, galerie photos, grille de PDFs, ou lecteur ExoPlayer.",
+        image: '/oral/figma/wireframe-detail-3d.png',
+      },
+      {
+        text: 'Plans — grille 2×2 de documents PDF',
+        detail: "L'onglet Plans affiche jusqu'à 4 plans techniques en grille 2×2. Un tap ouvre le PDF dans WebKit. Les placeholders étaient prévus pour être peuplés par l'admin via upload depuis la fiche produit.",
+        image: '/oral/figma/wireframe-detail-plans.png',
+      },
+      {
+        text: 'Vidéo — lecteur pleine largeur avec contrôles natifs',
+        detail: "L'onglet Vidéo affiche un player ExoPlayer pleine largeur avec les contrôles play/pause/seek. La vidéo est stockée localement — aucun streaming, lecture instantanée même sans réseau.",
+        image: '/oral/figma/wireframe-detail-video.png',
+      },
+    ],
+  },
+
+  {
+    id: 'evolution-ui',
+    section: 'Conception',
+    title: "Évolution de l'interface",
+    subtitle: 'Wireframe → app finale : ce que les retours utilisateurs ont changé',
+    points: [
+      {
+        text: "Accueil — d'une navigation simple à un écran de marque complet",
+        detail: "La wireframe ne montrait pas d'écran d'accueil — juste la navigation. Après les premières démos avec les commerciaux, le besoin est apparu : présenter SMP avant tout. Résultat : branding, 4 chiffres clés (50+ ans, 1000+ moules, 3 secteurs, 100% Made in France), photo des locaux et frise historique 1972–2024.",
+        image: '/oral/figma/app-accueil.jpg',
+      },
+      {
+        text: "Catalogue — grille de placeholders → recherche + tags + cards riches",
+        detail: "Wireframe : grille de cards grises sans contenu. App finale : barre de recherche full-text, tags filtrables par secteur (PET, PP, cosmétique, emballage…), cards avec icône, nom de catégorie, description et bouton CTA. Ajout demandé après retour : les commerciaux voulaient filtrer rapidement par secteur client.",
+        image: '/oral/figma/app-catalogue.jpg',
+      },
+      {
+        text: "Contact — absent de la wireframe initiale, entièrement conçu en itération",
+        detail: "Le formulaire de contact n'était pas maquetté dans Figma. Il a été conçu directement en code après les premières discussions sur le terrain. Layout 2 colonnes responsive (champs à gauche, capture photo CameraX à droite), 8 secteurs à cocher, zone notes, case RGPD obligatoire avant le bouton Enregistrer.",
+        image: '/oral/figma/app-contact.jpg',
+      },
+    ],
+  },
+
   {
     id: 'architecture',
     section: 'Conception',

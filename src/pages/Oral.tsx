@@ -140,6 +140,40 @@ const SLIDES: Slide[] = [
   },
 
   {
+    id: 'maquettes',
+    section: 'Conception',
+    title: 'Maquettes Figma',
+    subtitle: 'Wireframes haute fidélité validés avant développement',
+    points: [
+      {
+        text: 'Navigation principale — 4 onglets + header SMP',
+        detail: "Barre de navigation fixe en haut avec les 4 sections : Accueil, Contact, Catalogue, Présentation. L'onglet actif est mis en surbrillance en rouge (couleur SMP). Header avec logo, mention RGPD et accès paramètres — structure reprise telle quelle dans l'app finale.",
+        image: '/oral/figma/wireframe-catalogue.png',
+      },
+      {
+        text: 'Catalogue — grille de produits avec cards arrondies',
+        detail: "Grille 4 colonnes de cards produits avec coins arrondis et image de couverture. La première card montre un exemple réel (pompe cosmétique). Les autres sont des placeholders — l'admin peuple la grille sans recompiler.",
+        image: '/oral/figma/wireframe-catalogue.png',
+      },
+      {
+        text: 'Détail produit — tabs Photos · Modèle 3D · Plans · Vidéo',
+        detail: "Chaque fiche produit est organisée en 4 onglets. Le tab actif est mis en rouge. La zone centrale est dédiée au rendu du média sélectionné : viewer Filament 3D, galerie photos, grille de PDFs, ou lecteur ExoPlayer.",
+        image: '/oral/figma/wireframe-detail-3d.png',
+      },
+      {
+        text: 'Plans — grille 2×2 de documents PDF',
+        detail: "L'onglet Plans affiche jusqu'à 4 plans techniques en grille 2×2. Un tap ouvre le PDF dans WebKit. Les placeholders étaient prévus pour être peuplés par l'admin via upload depuis la fiche produit.",
+        image: '/oral/figma/wireframe-detail-plans.png',
+      },
+      {
+        text: 'Vidéo — lecteur pleine largeur avec contrôles natifs',
+        detail: "L'onglet Vidéo affiche un player ExoPlayer pleine largeur avec les contrôles play/pause/seek. La vidéo est stockée localement — aucun streaming, lecture instantanée même sans réseau.",
+        image: '/oral/figma/wireframe-detail-video.png',
+      },
+    ],
+  },
+
+  {
     id: 'architecture',
     section: 'Conception',
     title: 'Architecture MVVM + Clean',

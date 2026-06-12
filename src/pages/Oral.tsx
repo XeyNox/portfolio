@@ -67,6 +67,35 @@ const SLIDES: Slide[] = [
     ],
   },
 
+  {
+    id: 'cdc-objectifs',
+    section: 'Introduction',
+    title: 'Cahier des charges',
+    subtitle: 'Les 5 objectifs définis en amont',
+    points: [
+      {
+        text: 'Prise de contacts clients — formulaire + envoi email différé',
+        detail: "Saisir société, interlocuteur, email, téléphone, secteur et notes. L'envoi email est différé si hors ligne — les contacts sont sauvegardés localement et envoyés dès la reconnexion.",
+      },
+      {
+        text: 'Présentation de SMP — films, photos, informations entreprise',
+        detail: "Écran d'accueil avec branding SMP, diffusion de vidéos de présentation et de photos de l'entreprise. Tout le contenu stocké localement pour une disponibilité 100% sur stand.",
+      },
+      {
+        text: 'Catalogue de réalisations — moules avec photos, vidéos, plans 2D/3D',
+        detail: 'Navigation par catégories (cosmétique, pharmacie, emballage…), fiches produits avec galerie photos, vidéos de démonstration, visualisation de modèles 3D et plans PDF.',
+      },
+      {
+        text: 'Mise à jour simplifiée — gestion des contenus sans redéploiement',
+        detail: "Initialement prévu via un dossier partagé SMB depuis un ordinateur. Devenu un panel admin intégré directement dans l'application — voir slide suivante.",
+      },
+      {
+        text: 'Fonctionnement hors ligne — PRIORITÉ ABSOLUE',
+        detail: '"Toute l\'application doit fonctionner parfaitement sans connexion. Aucun écran de chargement infini ou d\'erreur réseau." — verbatim du cahier des charges. Tous les contenus synchronisés, toutes les saisies de contacts, toutes les consultations : 100% offline.',
+      },
+    ],
+  },
+
   // ── 2. ANALYSE & CONCEPTION ───────────────────────────────────────────────
   {
     id: 'choix-plateforme',
@@ -81,6 +110,35 @@ const SLIDES: Slide[] = [
       { text: "→ Choix : Android natif Kotlin + Compose Material 3", detail: "Ce choix garantit les meilleures performances hardware, une UI moderne Material 3 et une architecture propre MVVM — idéal pour un projet livré en production sur tablette." },
     ],
   },
+  {
+    id: 'cdc-pivots',
+    section: 'Conception',
+    title: 'Du CDC à la livraison',
+    subtitle: 'Ce qui a évolué — et pourquoi',
+    points: [
+      {
+        text: 'UI : XML Views + Material 3 → Jetpack Compose',
+        detail: 'Le CDC recommandait XML Views, solution stable et documentée. Compose a été adopté pour son UI déclarative, ses recompositions réactives aux StateFlow et sa cohérence avec les guidelines Google 2025. Résultat : zéro boilerplate XML, composants réutilisables.',
+      },
+      {
+        text: 'Sync contenus : dossier partagé SMB → panel admin intégré',
+        detail: "Le CDC prévoyait une synchronisation depuis un dossier réseau SMB (jcifs-ng). Cette architecture nécessitait un ordinateur sur le même réseau local. Le panel admin directement dans l'app répond au même besoin sans aucune infrastructure réseau — plus robuste pour une utilisation en salon.",
+      },
+      {
+        text: 'State management : LiveData → StateFlow + Coroutines',
+        detail: "Le CDC citait LiveData, solution officielle Jetpack de l'époque. StateFlow a été préféré : pas de dépendance Android dans le ViewModel, testable en JVM pur sans InstantTaskExecutorRule, et cohérent avec l'ensemble de l'architecture coroutines du projet.",
+      },
+      {
+        text: 'Email : WorkManager + file d\'attente → SMTP direct sur Dispatchers.IO',
+        detail: "Le CDC planifiait WorkManager pour gérer une file d'attente d'emails différés avec reprise automatique. Jakarta Mail sur Dispatchers.IO avec feedback immédiat à l'admin s'est avéré plus simple, plus direct et plus transparent — l'admin voit le résultat en temps réel.",
+      },
+      {
+        text: '→ Le CDC posait les bases, l\'implémentation a affiné chaque choix',
+        detail: "Chaque pivot répond à une contrainte découverte pendant le développement : complexité d'infrastructure, testabilité, cohérence architecturale. La spec initiale était solide — les évolutions l'ont rendue plus pragmatique.",
+      },
+    ],
+  },
+
   {
     id: 'architecture',
     section: 'Conception',

@@ -146,29 +146,19 @@ const SLIDES: Slide[] = [
     subtitle: 'Wireframes haute fidélité validés avant développement',
     points: [
       {
-        text: 'Navigation principale — 4 onglets + header SMP',
-        detail: "Barre de navigation fixe en haut avec les 4 sections : Accueil, Contact, Catalogue, Présentation. L'onglet actif est mis en surbrillance en rouge (couleur SMP). Header avec logo, mention RGPD et accès paramètres — structure reprise telle quelle dans l'app finale.",
+        text: 'Catalogue — grille de cards avec navigation 4 onglets',
+        detail: "Header SMP + barre de navigation fixe (Accueil, Contact, Catalogue, Présentation) reprise telle quelle dans l'app finale. Grille de cards arrondies avec image de couverture — l'admin peuple les produits sans recompiler.",
         image: '/oral/figma/wireframe-catalogue.png',
       },
       {
-        text: 'Catalogue — grille de produits avec cards arrondies',
-        detail: "Grille 4 colonnes de cards produits avec coins arrondis et image de couverture. La première card montre un exemple réel (pompe cosmétique). Les autres sont des placeholders — l'admin peuple la grille sans recompiler.",
-        image: '/oral/figma/wireframe-catalogue.png',
-      },
-      {
-        text: 'Détail produit — tabs Photos · Modèle 3D · Plans · Vidéo',
-        detail: "Chaque fiche produit est organisée en 4 onglets. Le tab actif est mis en rouge. La zone centrale est dédiée au rendu du média sélectionné : viewer Filament 3D, galerie photos, grille de PDFs, ou lecteur ExoPlayer.",
+        text: 'Détail produit — 4 onglets médias (Photos · 3D · Plans · Vidéo)',
+        detail: "Chaque fiche produit expose ses médias via 4 onglets. Le tab actif est surligné en rouge SMP. La zone centrale dédiée au rendu : viewer Filament 3D, galerie photos, PDFs ou ExoPlayer selon l'onglet sélectionné.",
         image: '/oral/figma/wireframe-detail-3d.png',
       },
       {
-        text: 'Plans — grille 2×2 de documents PDF',
-        detail: "L'onglet Plans affiche jusqu'à 4 plans techniques en grille 2×2. Un tap ouvre le PDF dans WebKit. Les placeholders étaient prévus pour être peuplés par l'admin via upload depuis la fiche produit.",
+        text: 'Plans — grille 2×2 de documents PDF cliquables',
+        detail: "L'onglet Plans affiche les plans techniques en grille 2×2. Un tap ouvre le PDF dans WebKit via FileProvider. Structure finale : identique à la maquette — un des rares écrans qui n'a pas nécessité d'itération.",
         image: '/oral/figma/wireframe-detail-plans.png',
-      },
-      {
-        text: 'Vidéo — lecteur pleine largeur avec contrôles natifs',
-        detail: "L'onglet Vidéo affiche un player ExoPlayer pleine largeur avec les contrôles play/pause/seek. La vidéo est stockée localement — aucun streaming, lecture instantanée même sans réseau.",
-        image: '/oral/figma/wireframe-detail-video.png',
       },
     ],
   },
@@ -862,12 +852,12 @@ function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
 
       {hasMedia ? (
         <div className="grid grid-cols-2 gap-10 items-center">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center min-h-[45vh]">
             {point.image && (
               <img
                 src={point.image}
-                alt={point.text}
-                className="max-h-[60vh] w-full object-contain rounded-lg"
+                alt=""
+                className="max-h-[65vh] w-auto max-w-full object-contain rounded-xl drop-shadow-2xl"
               />
             )}
             {point.video && (

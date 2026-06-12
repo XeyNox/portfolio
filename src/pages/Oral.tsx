@@ -6,6 +6,7 @@ interface SlidePoint {
   detail?: string
   image?: string
   video?: string
+  code?: string
 }
 
 interface Slide {
@@ -86,9 +87,9 @@ const SLIDES: Slide[] = [
     title: 'Architecture MVVM + Clean',
     subtitle: '3 couches strictement séparées',
     points: [
-      { text: "Domain Layer — interfaces Repository, modèles métier purs", detail: "Le Domain Layer définit les contrats (interfaces Repository) et les modèles métier sans aucune dépendance Android. Il peut être testé en pur JVM sans émulateur." },
-      { text: "Data Layer — implémentations Room, DAOs, services (SMTP, email)", detail: "Le Data Layer implémente les interfaces du Domain : les DAOs Room accèdent à SQLite, et EmailService.kt gère l'envoi SMTP via Jakarta Mail sur Dispatchers.IO." },
-      { text: "Presentation Layer — ViewModels, états UI, composables Compose", detail: "Les ViewModels exposent des StateFlow d'états UI immuables. Les composables Compose s'abonnent via collectAsStateWithLifecycle() et se recomposent uniquement si l'état change." },
+      { text: "Domain Layer — interfaces Repository, modèles métier purs", detail: "Le Domain Layer définit les contrats (interfaces Repository) et les modèles métier sans aucune dépendance Android. Il peut être testé en pur JVM sans émulateur.", image: '/oral/code/repository-interface.png' },
+      { text: "Data Layer — implémentations Room, DAOs, services (SMTP, email)", detail: "Le Data Layer implémente les interfaces du Domain : les DAOs Room accèdent à SQLite, et EmailService.kt gère l'envoi SMTP via Jakarta Mail sur Dispatchers.IO.", image: '/oral/code/contact-dao.png' },
+      { text: "Presentation Layer — ViewModels, états UI, composables Compose", detail: "Les ViewModels exposent des StateFlow d'états UI immuables. Les composables Compose s'abonnent via collectAsStateWithLifecycle() et se recomposent uniquement si l'état change.", image: '/oral/code/viewmodel-stateflow.png' },
       { text: "→ Couplage faible, testabilité maximale, évolutivité", detail: "Chaque couche est testable indépendamment : le Domain en JUnit pur, le Data avec des bases Room en mémoire, et la Presentation avec des faux Repository via Mockk." },
     ],
   },
@@ -113,7 +114,7 @@ const SLIDES: Slide[] = [
     points: [
       { text: "CATEGORIES — id, nom, description, emoji, imagePath, ordre", detail: "Chaque catégorie porte un emoji affiché sur la carte de la grille, une image de couverture et un champ ordre permettant au commercial de réorganiser l'affichage sans toucher au code." },
       { text: "PRODUCTS — id, categoryId (FK), nom, specs, imagePaths (JSON), model3dPath, videoPath, pdfPath", detail: "imagePaths est sérialisé en JSON dans la colonne SQLite grâce à kotlinx-serialization, permettant de stocker une liste de chemins sans table de jonction supplémentaire." },
-      { text: "CONTACTS — id, société, email, téléphone, secteurs, photoPath, statut (pending|sent), timestamps", detail: "Le champ statut (pending | sent) permet de suivre l'état d'envoi email de chaque lead. Un indicateur visuel dans l'historique reflète ce statut en temps réel via Room Flow." },
+      { text: "CONTACTS — id, société, email, téléphone, secteurs, photoPath, statut (pending|sent), timestamps", detail: "Le champ statut (pending | sent) permet de suivre l'état d'envoi email de chaque lead. Un indicateur visuel dans l'historique reflète ce statut en temps réel via Room Flow.", image: '/oral/code/contact-entity.png' },
       { text: "MEDIA_FILES — id, fileName, filePath, mimeType, fileSize", detail: "Cette table centralise les métadonnées des fichiers uploadés par l'admin, facilitant la gestion du stockage et permettant une suppression propre sans orphelins sur le disque." },
       { text: "APP_SETTINGS — clé / valeur (config SMTP, traductions, paramètres admin)", detail: "Table clé/valeur flexible qui stocke la configuration SMTP (host, port, identifiants chiffrés), les surcharges de chaînes multilingues et les préférences admin sans migration de schéma." },
     ],
@@ -125,7 +126,7 @@ const SLIDES: Slide[] = [
     subtitle: 'Koin 3.5.3 — 3 modules',
     points: [
       { text: "DatabaseModule — Room AppDatabase, tous les DAOs", detail: "Déclare l'AppDatabase en singleton et expose chaque DAO (contactDao, productDao, categoryDao...) comme dépendance injectable. La base est créée une seule fois à l'init de l'app." },
-      { text: "RepositoryModule — lie interfaces Domain aux implémentations Data", detail: "Koin mappe chaque interface du Domain vers son implémentation Data : bind<ContactRepository>() { ContactRepositoryImpl(get()) }. Le ViewModel ne voit jamais l'implémentation concrète." },
+      { text: "RepositoryModule — lie interfaces Domain aux implémentations Data", detail: "Koin mappe chaque interface du Domain vers son implémentation Data : bind<ContactRepository>() { ContactRepositoryImpl(get()) }. Le ViewModel ne voit jamais l'implémentation concrète.", image: '/oral/code/koin-modules.png' },
       { text: "ViewModelModule — ViewModels de chaque écran", detail: "Chaque ViewModel est déclaré avec viewModel { ... } pour que Koin le crée et le détruise selon le cycle de vie Android, avec injection automatique des dépendances Repository." },
       { text: "→ Aucun couplage direct entre couches, mocks faciles en test", detail: "En test, il suffit de remplacer un module Koin par un module de test injectant des faux Repository — sans modifier une ligne de code de production." },
     ],
@@ -378,7 +379,7 @@ const SLIDES: Slide[] = [
     title: 'Tests',
     points: [
       { text: "JUnit 4/5 — tests unitaires des ViewModels et Repositories", detail: "Les ViewModels sont testés avec JUnit 5 en pur JVM : on injecte de faux Repository via Mockk, on appelle les méthodes du ViewModel et on vérifie les émissions du StateFlow sans démarrer d'émulateur Android." },
-      { text: "Mockk — mocking des interfaces Repository sans dépendance Room", detail: "Mockk permet de mocker les interfaces Repository avec une syntaxe Kotlin fluente : coEvery { contactRepository.getAllContacts() } returns flowOf(fakeContacts). Les coroutines sont gérées avec runTest de kotlinx-coroutines-test." },
+      { text: "Mockk — mocking des interfaces Repository sans dépendance Room", detail: "Mockk permet de mocker les interfaces Repository avec une syntaxe Kotlin fluente : coEvery { contactRepository.getAllContacts() } returns flowOf(fakeContacts). Les coroutines sont gérées avec runTest de kotlinx-coroutines-test.", image: '/oral/code/mockk-test.png' },
       { text: "Turbine — test des flux Kotlin Flow (émissions, completions)", detail: "Turbine est une extension de test pour Kotlin Flow : flow.test { awaitItem() } permet d'attendre et d'asserter chaque émission séquentiellement, y compris les erreurs et les completions, sans race conditions." },
       { text: "Tests d'intégration Room — InstrumentedTest sur base en mémoire", detail: "Les DAOs Room sont testés avec une base in-memory (Room.inMemoryDatabaseBuilder) dans des tests instrumentés Android. Cela valide les requêtes SQL réelles sans persister de données entre les tests." },
       { text: "Architecture Clean — chaque couche testable indépendamment", detail: "La séparation en couches (Domain, Data, Presentation) permet de tester chacune sans les autres : Domain en JUnit pur, Data avec des mocks Room en mémoire, Presentation avec des faux Repository Mockk." },
@@ -392,7 +393,7 @@ const SLIDES: Slide[] = [
       { text: "Coil — cache mémoire + disque pour images, chargement lazy", detail: "Coil maintient un cache LRU en mémoire (taille automatique basée sur la RAM disponible) et un cache disque persistant entre sessions. Les images ne sont décodées qu'à la taille réelle de l'ImageView — économie CPU et RAM." },
       { text: "Filament — rendu 3D GPU-accéléré, hors du thread principal", detail: "Filament (moteur de rendu PBR de Google) exécute tout le rendu sur le GPU via OpenGL ES 3.0. Les modèles 3D sont chargés asynchroniquement sur un thread dédié, préservant la fluidité de l'UI Compose à 60fps." },
       { text: "Kotlin Coroutines — toutes les I/O sur Dispatchers.IO", detail: "Dispatchers.IO est un pool de threads optimisé pour les opérations bloquantes (fichiers, réseau, base de données). Toutes les opérations Room, FileProvider et Jakarta Mail y sont exécutées via withContext(Dispatchers.IO)." },
-      { text: "Room Flow — mises à jour UI réactives sans polling", detail: "Les requêtes Room annotées @Query retournant Flow<T> s'appuient sur SQLite triggers internes. Room détecte chaque INSERT/UPDATE/DELETE et notifie automatiquement les collectors — zéro polling, zéro latence." },
+      { text: "Room Flow — mises à jour UI réactives sans polling", detail: "Les requêtes Room annotées @Query retournant Flow<T> s'appuient sur SQLite triggers internes. Room détecte chaque INSERT/UPDATE/DELETE et notifie automatiquement les collectors — zéro polling, zéro latence.", image: '/oral/code/room-flow.png' },
       { text: "Large heap activé pour la gestion des médias lourds", detail: "android:largeHeap=\"true\" dans le Manifest demande à Android un heap élargi pour l'application. Indispensable pour Filament qui charge des meshes 3D et des textures haute résolution simultanément en mémoire." },
     ],
   },
@@ -430,7 +431,7 @@ const SLIDES: Slide[] = [
     title: 'Défi 3 — Email SMTP sur Android',
     points: [
       { text: "Problème : Android bloque les opérations réseau sur le main thread", detail: "Android lève une NetworkOnMainThreadException si on tente un appel réseau sur le thread principal depuis Android 3.0. Les premières implémentations avec Jakarta Mail en AppCompatActivity crashaient systématiquement." },
-      { text: "Solution : EmailService.kt sur Dispatchers.IO via coroutine", detail: "EmailService.kt expose une suspend fun sendEmail() exécutée via withContext(Dispatchers.IO). ExportViewModel lance la coroutine dans viewModelScope — annulation automatique si l'écran est quitté pendant l'envoi." },
+      { text: "Solution : EmailService.kt sur Dispatchers.IO via coroutine", detail: "EmailService.kt expose une suspend fun sendEmail() exécutée via withContext(Dispatchers.IO). ExportViewModel lance la coroutine dans viewModelScope — annulation automatique si l'écran est quitté pendant l'envoi.", image: '/oral/code/email-service.png' },
       { text: "Jakarta Mail (Angus Mail) — supporte SSL/TLS et authentification", detail: "Angus Mail 2.0.2 est l'implémentation Jakarta Mail officielle, compatible Android. Elle gère SSL/TLS (port 465 et 587), l'authentification SMTP (LOGIN, PLAIN, OAuth2) et le contenu MIME multipart pour les pièces jointes." },
       { text: "Gestion des erreurs : timeout, auth failure, SSL handshake", detail: "EmailService wrappe l'envoi dans un try/catch catchant MessagingException. Les codes d'erreur spécifiques (535 = mauvais identifiants, timeout = réseau indisponible) sont traduits en messages utilisateur compréhensibles." },
       { text: "→ Envoi fiable avec feedback utilisateur en cas d'erreur", detail: "ExportViewModel expose un UiState (Sending, Success, Error(message)) observé par ExportScreen. Un Snackbar Material 3 affiche le résultat immédiatement — l'admin sait exactement si l'envoi a réussi ou pourquoi il a échoué." },
@@ -449,7 +450,121 @@ const SLIDES: Slide[] = [
     ],
   },
 
-  // ── 7. COMPÉTENCES RNCP ───────────────────────────────────────────────────
+  // ── 7. INSIGHTS TECHNIQUES ───────────────────────────────────────────────
+  {
+    id: 'room-reactive',
+    section: 'Insights',
+    title: 'Room : Flow réactif vs one-shot',
+    subtitle: 'Ce que les docs ne montrent pas',
+    points: [
+      {
+        text: 'fun getAllContacts(): Flow<List<Contact>> — requête réactive',
+        detail: "Room observe la table via un trigger SQLite interne. Chaque INSERT/UPDATE/DELETE re-émet automatiquement une nouvelle liste. L'UI se met à jour sans polling, sans callback manuel — la réactivité est dans le type de retour.",
+      },
+      {
+        text: 'suspend fun getById(id: Long): Contact? — requête one-shot',
+        detail: "Une suspend fun s'exécute une fois et retourne. Pour la lecture unique (détail d'un produit), c'est le bon choix — pas de collector à gérer. Pour une liste qui doit rester synchronisée, il faut Flow.",
+      },
+      {
+        text: 'val id: Long = 0 — valeur sentinelle Room',
+        detail: "Room utilise 0 comme valeur sentinelle à l'insertion : si id == 0, autoGenerate génère un id. Si id != 0, Room tente d'insérer avec cet id. Ce n'est pas écrit clairement dans la doc — ça fait crasher si on insère un Contact avec un id hardcodé.",
+      },
+      {
+        text: 'sentAt: Long? plutôt que Date — Room et les types complexes',
+        detail: "Room ne sait pas sérialiser java.util.Date nativement. Il faut soit un @TypeConverter (classe séparée, boilerplate), soit rester sur des primitives. Long (timestamp Unix ms) est lisible, portable, triable en SQL — meilleur choix ici.",
+      },
+      {
+        text: '→ Le type de retour du DAO définit le comportement réactif',
+        detail: 'Flow<T> = la requête reste active et re-émet. suspend T = une exécution, un résultat. Ce n\'est pas une préférence stylistique — c\'est une décision architecturale qui impacte la façon dont l\'UI se synchronise avec la base.',
+      },
+    ],
+  },
+  {
+    id: 'coroutines-pratique',
+    section: 'Insights',
+    title: 'Coroutines : withContext vs launch',
+    subtitle: 'La différence que les tutos ne précisent pas',
+    points: [
+      {
+        text: 'withContext(Dispatchers.IO) — switch de thread, résultat attendu',
+        detail: "withContext suspend la coroutine courante, exécute le bloc sur Dispatchers.IO, puis reprend sur le dispatcher d'origine avec le résultat. C'est un switch de contexte — la coroutine parente attend la fin. Utilisé dans EmailService pour l'envoi SMTP.",
+      },
+      {
+        text: 'launch(Dispatchers.IO) — nouvelle coroutine indépendante, résultat ignoré',
+        detail: "launch crée un nouveau Job indépendant. La coroutine parente continue immédiatement sans attendre. Utile pour fire-and-forget. Mauvais choix si on a besoin du résultat — on ne peut pas 'await' un launch sans Deferred.",
+      },
+      {
+        text: 'viewModelScope.launch — survit aux rotations d\'écran',
+        detail: "viewModelScope est lié au ViewModel, pas à l'Activity. L'envoi email lancé dans viewModelScope continue si l'utilisateur tourne la tablette — le ViewModel survit à la rotation. lifecycleScope se cancelle avec l'Activity.",
+      },
+      {
+        text: 'Dispatchers.IO — pool de threads pour les opérations bloquantes',
+        detail: "Dispatchers.IO maintient un pool de 64 threads max. Idéal pour Room, Jakarta Mail, FileIO. Dispatchers.Main = thread UI Android. Tout appel bloquant sur Main = ANR (Application Not Responding) — Android tue l'app après 5 secondes.",
+      },
+      {
+        text: '→ Règle simple : I/O bloquant → withContext(Dispatchers.IO) dans une suspend fun',
+        detail: "La signature suspend fun sendContacts() = withContext(Dispatchers.IO) { ... } est le pattern idiomatique : la fonction s'auto-distribue sur le bon dispatcher, l'appelant n'a pas à se soucier du thread. C'est la convention recommandée par les guidelines Kotlin.",
+      },
+    ],
+  },
+  {
+    id: 'koin-scoping',
+    section: 'Insights',
+    title: 'Koin : durée de vie des dépendances',
+    subtitle: 'single · factory · viewModel — le mauvais choix = bug silencieux',
+    points: [
+      {
+        text: 'single { } — une seule instance pour toute l\'app',
+        detail: "ContactRepository, AppDatabase, EmailService sont déclarés single. Ils sont créés au premier get() et réutilisés partout. Utiliser single pour un ViewModel = mémoire partagée entre écrans, état qui persiste après navigation — bug subtil.",
+      },
+      {
+        text: 'factory { } — nouvelle instance à chaque injection',
+        detail: "factory crée un nouvel objet à chaque appel get(). Utiliser factory pour un Repository = une nouvelle connexion Room à chaque ViewModel = gaspillage de ressources et cache in-memory systématiquement vide.",
+      },
+      {
+        text: 'viewModel { } — lié au cycle de vie Android ViewModel',
+        detail: "viewModel { ContactHistoryViewModel(get(), get()) } crée le ViewModel via Koin et le lie au ViewModelStore Android. Il survit aux rotations mais est détruit quand l'utilisateur quitte définitivement l'écran.",
+      },
+      {
+        text: '→ Erreur classique : déclarer un ViewModel en single',
+        detail: "Un ViewModel en single est partagé entre tous les écrans et n'est jamais détruit — fuite mémoire assurée. Le StateFlow continue d'émettre, les coroutines tournent en arrière-plan. Koin ne lève pas d'erreur : il faut connaître la sémantique de chaque scope.",
+      },
+      {
+        text: '→ Erreur classique 2 : déclarer un Repository en factory',
+        detail: "Un Repository en factory = une nouvelle instance injectée dans chaque ViewModel. Si le Repository maintient un cache en mémoire, chaque ViewModel voit son propre cache vide. Room n'est pas affecté (base commune), mais tout état in-memory est dupliqué.",
+      },
+    ],
+  },
+  {
+    id: 'stateflow-livedata',
+    section: 'Insights',
+    title: 'StateFlow vs LiveData',
+    subtitle: 'Pourquoi StateFlow en 2025',
+    points: [
+      {
+        text: 'LiveData — lifecycle-aware mais dépendante d\'Android',
+        detail: "LiveData observe le lifecycle automatiquement. Mais elle importe androidx.lifecycle dans le ViewModel — rendant le ViewModel dépendant d'Android, moins testable en JVM pur (besoin de InstantTaskExecutorRule en test).",
+      },
+      {
+        text: 'StateFlow — coroutine-native, testable en JVM pur',
+        detail: "StateFlow fait partie de kotlinx-coroutines — pas de dépendance Android. Le ViewModel est testable sans émulateur, sans règle JUnit spéciale. runTest gère le temps des coroutines, collectAsStateWithLifecycle() gère le lifecycle côté Compose.",
+      },
+      {
+        text: 'StateFlow a toujours une valeur initiale',
+        detail: "MutableStateFlow(initialValue) requiert une valeur à la création — impossible d'avoir un état null non-intentionnel. LiveData.value est nullable par défaut et peut rester null jusqu'au premier post — source de NullPointerException en UI.",
+      },
+      {
+        text: 'collectAsStateWithLifecycle() — lifecycle à la frontière UI seulement',
+        detail: "collectAsStateWithLifecycle() arrête la collection quand le composable quitte le cycle de vie actif. Contrairement à collectAsState() qui continue de collecter même en background — gaspillage CPU/batterie sur une tablette 24h allumée.",
+      },
+      {
+        text: '→ StateFlow dans le ViewModel, collectAsStateWithLifecycle() dans Compose',
+        detail: "Ce pattern garde le ViewModel libre de toute dépendance Android et délègue la gestion lifecycle au composable. C'est la recommandation officielle Google depuis Android Summit 2022 — et ce que ce projet applique sur tous les écrans.",
+      },
+    ],
+  },
+
+  // ── 8. COMPÉTENCES RNCP (was 7) ──────────────────────────────────────────
   {
     id: 'rncp-intro',
     section: 'Compétences',
@@ -616,6 +731,7 @@ interface ZoomSlideProps {
 function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
   const point = slide.points[pointIndex]
   const hasMedia = !!(point.image || point.video)
+  const hasCode = !!point.code
 
   return (
     <div className="w-full">
@@ -652,6 +768,18 @@ function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
               <p className="text-zinc-400 text-lg leading-relaxed">{point.detail}</p>
             )}
           </div>
+        </div>
+      ) : hasCode ? (
+        <div className="grid grid-cols-2 gap-10 items-start">
+          <div className="flex flex-col gap-5 pt-2">
+            <p className="text-2xl font-semibold text-zinc-100 leading-snug">{point.text}</p>
+            {point.detail && (
+              <p className="text-zinc-400 text-base leading-relaxed">{point.detail}</p>
+            )}
+          </div>
+          <pre className="bg-zinc-900 border border-zinc-700/60 rounded-xl p-5 text-sm text-[#e8ff00]/90 font-mono leading-relaxed overflow-auto max-h-[58vh] whitespace-pre">
+            <code>{point.code}</code>
+          </pre>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center text-center gap-6 min-h-[40vh]">

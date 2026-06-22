@@ -1,4 +1,6 @@
 import { SLIDES, type Slide, type Step } from './slides'
+import ArchitectureDiagram from './diagrams/ArchitectureDiagram'
+import DbSchemaDiagram from './diagrams/DbSchemaDiagram'
 
 interface SlideViewProps {
   step: Step
@@ -68,8 +70,7 @@ function ZoomSlide({ slide, pointIndex }: { slide: Slide; pointIndex: number }) 
       ) : hasDiagram ? (
         <div className="flex flex-col gap-8">
           <p className="text-2xl font-semibold text-zinc-100 leading-snug">{point.text}</p>
-          {/* diagrams wired in Task 4 */}
-          {null}
+          {point.diagram === 'architecture' ? <ArchitectureDiagram /> : <DbSchemaDiagram />}
         </div>
       ) : hasCode ? (
         <div className="grid grid-cols-2 gap-10 items-start">

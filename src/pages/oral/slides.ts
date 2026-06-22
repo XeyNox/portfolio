@@ -204,7 +204,7 @@ export const SLIDES: Slide[] = [
       { text: "Domain Layer — interfaces Repository, modèles métier purs", detail: "Le Domain Layer définit les contrats (interfaces Repository) et les modèles métier sans aucune dépendance Android. Il peut être testé en pur JVM sans émulateur.", image: '/oral/code/repository-interface.png' },
       { text: "Data Layer — implémentations Room, DAOs, services (SMTP, email)", detail: "Le Data Layer implémente les interfaces du Domain : les DAOs Room accèdent à SQLite, et EmailService.kt gère l'envoi SMTP via Jakarta Mail sur Dispatchers.IO.", image: '/oral/code/contact-dao.png' },
       { text: "Presentation Layer — ViewModels, états UI, composables Compose", detail: "Les ViewModels exposent des StateFlow d'états UI immuables. Les composables Compose s'abonnent via collectAsStateWithLifecycle() et se recomposent uniquement si l'état change.", image: '/oral/code/viewmodel-stateflow.png' },
-      { text: "→ Couplage faible, testabilité maximale, évolutivité", detail: "Chaque couche est testable indépendamment : le Domain en JUnit pur, le Data avec des bases Room en mémoire, et la Presentation avec des faux Repository via Mockk." },
+      { text: "→ Couplage faible, testabilité maximale, évolutivité", detail: "Chaque couche est testable indépendamment : le Domain en JUnit pur, le Data avec des bases Room en mémoire, et la Presentation avec des faux Repository via Mockk.", diagram: 'architecture' },
     ],
   },
   {
@@ -226,7 +226,7 @@ export const SLIDES: Slide[] = [
     title: 'Schéma de base de données',
     subtitle: '5 entités Room / SQLite',
     points: [
-      { text: "CATEGORIES — id, nom, description, emoji, imagePath, ordre", detail: "Chaque catégorie porte un emoji affiché sur la carte de la grille, une image de couverture et un champ ordre permettant au commercial de réorganiser l'affichage sans toucher au code." },
+      { text: "CATEGORIES — id, nom, description, emoji, imagePath, ordre", detail: "Chaque catégorie porte un emoji affiché sur la carte de la grille, une image de couverture et un champ ordre permettant au commercial de réorganiser l'affichage sans toucher au code.", diagram: 'db' },
       { text: "PRODUCTS — id, categoryId (FK), nom, specs, imagePaths (JSON), model3dPath, videoPath, pdfPath", detail: "imagePaths est sérialisé en JSON dans la colonne SQLite grâce à kotlinx-serialization, permettant de stocker une liste de chemins sans table de jonction supplémentaire." },
       { text: "CONTACTS — id, société, email, téléphone, secteurs, photoPath, statut (pending|sent), timestamps", detail: "Le champ statut (pending | sent) permet de suivre l'état d'envoi email de chaque lead. Un indicateur visuel dans l'historique reflète ce statut en temps réel via Room Flow.", image: '/oral/code/contact-entity.png' },
       { text: "MEDIA_FILES — id, fileName, filePath, mimeType, fileSize", detail: "Cette table centralise les métadonnées des fichiers uploadés par l'admin, facilitant la gestion du stockage et permettant une suppression propre sans orphelins sur le disque." },

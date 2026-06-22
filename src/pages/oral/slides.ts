@@ -214,7 +214,16 @@ export const SLIDES: Slide[] = [
     subtitle: 'MVVM avec StateFlow et Coroutines',
     points: [
       { text: "UI Compose — observe StateFlow via collectAsStateWithLifecycle()", detail: "collectAsStateWithLifecycle() arrête automatiquement la collecte quand le composable quitte le cycle de vie actif, évitant les fuites mémoire sur Android." },
-      { text: "ViewModel — expose états UI, orchestre les cas d'usage", detail: "Le ViewModel transforme les données brutes du Repository en états UI consommables (UiState sealed class : Loading, Success, Error) et survit aux rotations d'écran." },
+      { text: "ViewModel — expose états UI, orchestre les cas d'usage", detail: "Le ViewModel transforme les données brutes du Repository en états UI consommables (UiState sealed class : Loading, Success, Error) et survit aux rotations d'écran.", code: `private val _uiState = MutableStateFlow(ContactHistoryUiState())
+val uiState: StateFlow<ContactHistoryUiState> = _uiState.asStateFlow()
+
+private fun loadContacts() {
+    viewModelScope.launch {
+        contactRepository.getAllContacts().collect { contacts ->
+            _uiState.update { it.copy(allContacts = contacts) }
+        }
+    }
+}` },
       { text: "Repository (interface) — contrat du Domain Layer", detail: "L'interface Repository définit le contrat métier sans détail d'implémentation. Le ViewModel n'a jamais connaissance de Room, SQL ou Jakarta Mail — uniquement de ce contrat." },
       { text: "RepositoryImpl (data) — implémentation Room + services", detail: "L'implémentation concrète orchestre les DAOs Room, le cache et les services. Elle est injectée par Koin au lieu de l'interface, invisible pour le ViewModel." },
       { text: "Room DAO → SQLite local — persistance offline-first", detail: "Room génère automatiquement le code SQL à la compilation via les annotations @Dao. Les requêtes retournent des Flow<List<T>> qui émettent automatiquement quand la base est modifiée." },
@@ -519,7 +528,7 @@ export const SLIDES: Slide[] = [
     title: 'Tests',
     points: [
       { text: "JUnit 5 (Jupiter) — tests unitaires via useJUnitPlatform()", detail: "Le projet est configuré pour exécuter ses tests sur la plateforme JUnit 5 (Jupiter) — testOptions { unitTests.all { it.useJUnitPlatform() } } — en pur JVM, sans démarrer d'émulateur Android." },
-      { text: "ContactHistoryViewModelTest — 5 cas couverts", detail: "Les tests vérifient le calcul des compteurs par statut, le filtrage de recherche, le cas d'une recherche vide, la délégation de suppression au repository et la détection d'une configuration SMTP complète." },
+      { text: "ContactHistoryViewModelTest — 5 cas couverts", detail: "Les tests vérifient le calcul des compteurs par statut, le filtrage de recherche, le cas d'une recherche vide, la délégation de suppression au repository et la détection d'une configuration SMTP complète.", image: '/oral/code/mockk-test1.png' },
       { text: "Mockk — mocking des interfaces Repository (aucune dépendance Room)", detail: "Mockk simule ContactRepository et AppSettingRepository avec une syntaxe Kotlin fluente : every { repo.getAllContacts() } returns flowOf(fakeContacts). Aucune base Room n'est nécessaire pour ces tests." },
       { text: "Turbine + coroutines-test — vérification des émissions StateFlow", detail: "runTest et StandardTestDispatcher contrôlent le temps virtuel des coroutines ; Turbine (uiState.test { awaitItem() }) permet d'asserter chaque émission du StateFlow séquentiellement, sans race condition." },
       { text: "Architecture Clean — ViewModels testables sans émulateur Android", detail: "La séparation Domain / Data / Presentation permet d'isoler les couches : on injecte de faux Repository et on observe les états UI exposés par le ViewModel, le tout sur la JVM uniquement." },
@@ -790,7 +799,14 @@ export const SLIDES: Slide[] = [
     title: 'C3 — Base de données',
     points: [
       { text: "Modélisation relationnelle : 5 entités, clés étrangères, cascade delete", detail: "La clé étrangère PRODUCTS.categoryId référence CATEGORIES.id avec ON DELETE CASCADE — supprimer une catégorie supprime automatiquement tous ses produits. Room vérifie l'intégrité référentielle via @ForeignKey." },
-      { text: "Room ORM avec DAOs typés (ContactDao, ProductDao, etc.)", detail: "Chaque DAO est une interface annotée @Dao avec des méthodes @Query, @Insert, @Update, @Delete. Room génère l'implémentation SQL à la compilation — les erreurs de syntaxe SQL sont des erreurs de build, pas des crashes runtime." },
+      { text: "Room ORM avec DAOs typés (ContactDao, ProductDao, etc.)", detail: "Chaque DAO est une interface annotée @Dao avec des méthodes @Query, @Insert, @Update, @Delete. Room génère l'implémentation SQL à la compilation — les erreurs de syntaxe SQL sont des erreurs de build, pas des crashes runtime.", code: `@Dao
+interface ContactDao {
+    @Query("SELECT * FROM contacts ORDER BY createdAt DESC")
+    fun getAllContacts(): Flow<List<Contact>>
+
+    @Insert
+    suspend fun insert(contact: Contact): Long
+}` },
       { text: "Requêtes Flow réactives — mises à jour UI automatiques", detail: "getAllContacts(): Flow<List<Contact>> retourne un Flow qui émet une nouvelle liste à chaque modification de la table CONTACTS. Le ViewModel collecte ce Flow et met à jour le StateFlow UI sans aucun code de notification manuel." },
       { text: "DatabaseSeeder — initialisation des données au premier lancement", detail: "DatabaseSeeder.kt est appelé dans RoomDatabase.Callback.onCreate(). Il peuple les tables CATEGORIES et PRODUCTS avec les données initiales et copie les médias d'exemple depuis les assets vers le stockage interne." },
       { text: "Migrations Room pour les évolutions de schéma", detail: "Chaque modification de schéma (nouvelle colonne, nouvelle table) est accompagnée d'un Migration(from, to) avec le SQL ALTER TABLE correspondant. Room vérifie l'intégrité du schéma au démarrage — une migration manquante crash l'app au démarrage, pas en production silencieusement." },

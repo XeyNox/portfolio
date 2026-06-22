@@ -8,6 +8,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import Oral from './pages/Oral'
 import PresenterView from './pages/oral/PresenterView'
+import NotesPage from './pages/oral/NotesPage'
 
 function Portfolio() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="/" element={<Portfolio />} />
       <Route path="/oral" element={<Oral />} />
       <Route path="/oral/presenter" element={<PresenterView />} />
+      <Route path="/oral/notes" element={<NotesPage />} />
     </Routes>
   )
 }

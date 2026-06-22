@@ -259,7 +259,7 @@ const SLIDES: Slide[] = [
       { text: "UI : Jetpack Compose + Material 3 (BOM 2024.12)", detail: "La BOM (Bill of Materials) 2024.12 garantit la cohérence des versions de toutes les librairies Compose. Material 3 fournit les composants visuels (Card, Button, Dialog) et le système de couleurs dynamiques." },
       { text: "Base de données : Room 2.6.1 (SQLite, DAOs, Flow réactif)", detail: "Room abstrait SQLite tout en conservant ses performances. Les DAOs annotés génèrent du code SQL à la compilation — les erreurs SQL sont détectées au build, pas à l'exécution." },
       { text: "DI : Koin 3.5.3", detail: "Koin est léger (pas de génération de code à la compilation contrairement à Dagger/Hilt) et s'intègre nativement avec les ViewModels Android et le cycle de vie Compose." },
-      { text: "Build : Gradle 9.3.1 + libs.versions.toml centralisé", detail: "Le fichier libs.versions.toml centralise toutes les versions de dépendances en un seul endroit. Gradle 9 apporte des builds incrémentaux plus rapides et un meilleur support Kotlin Multiplatform." },
+      { text: "Build : Gradle 8.13 + AGP 8.9.1, libs.versions.toml centralisé", detail: "Le fichier libs.versions.toml centralise toutes les versions de dépendances en un seul endroit. Le projet s'appuie sur Gradle 8.13 et le plugin Android Gradle (AGP) 8.9.1." },
       { text: "SDK min : Android 24 · Target : Android 35", detail: "Android 24 (Android 7.0, 2016) couvre 95%+ des appareils Android actifs. Le target SDK 35 (Android 15) garantit la compatibilité avec les comportements récents du système." },
     ],
   },
@@ -297,7 +297,7 @@ const SLIDES: Slide[] = [
       { text: "Jetpack Navigation Compose 2.8.5 — NavGraph typé", detail: "Navigation Compose 2.8.5 introduit les routes typées (type-safe navigation) via des sealed classes Screen. Les arguments passés entre écrans sont validés à la compilation, plus de StringExtra." },
       { text: "BottomNavBar — Accueil · Catalogue · Contact · Export", detail: "La barre de navigation inférieure (SMPNavigationBar.kt) utilise NavigationBar de Material 3 avec 4 destinations. L'onglet actif est mis en surbrillance via currentBackStackEntry observé en StateFlow." },
       { text: "SMPHeader — barre supérieure unifiée avec accès admin", detail: "SMPHeader.kt est un composable partagé affiché sur tous les écrans. Il expose un bouton d'accès discret au mode admin et le nom de l'écran courant, garantissant une cohérence visuelle globale." },
-      { text: "Landscape forcé — orientation optimisée kiosque tablette", detail: "L'orientation paysage est forcée dans le Manifest via screenOrientation=\"landscape\". Sur une tablette 10\", cela maximise la surface d'affichage pour le catalogue et optimise le layout deux colonnes." },
+      { text: "Portrait verrouillé — orientation fixe pour un affichage cohérent", detail: "L'orientation est verrouillée en portrait dans le Manifest via screenOrientation=\"portrait\", garantissant un affichage identique quelle que soit la manipulation de la tablette sur le stand." },
     ],
   },
   {
@@ -424,6 +424,19 @@ const SLIDES: Slide[] = [
     ],
   },
   {
+    id: 'pdf-generation',
+    section: 'Fonctionnalités',
+    title: 'Génération de PDF native',
+    subtitle: 'Android PdfDocument API',
+    points: [
+      { text: "Rapport A4 (595 × 842 pt) généré entièrement par le code", detail: "Le PDF est dessiné sur un Canvas via l'API native Android PdfDocument, sans aucune dépendance externe : titres, sous-titres et lignes de séparation sont positionnés au pixel près." },
+      { text: "Pagination automatique — checkPage() / startNewPage()", detail: "Une fonction checkPage() surveille la position verticale courante et bascule sur une nouvelle page dès que le contenu dépasse la zone utile, gérant proprement les exports de nombreux contacts." },
+      { text: "En-tête SMP, tableau des contacts, photos de cartes centrées", detail: "Chaque contact est rendu avec sa société en gras, ses coordonnées libellées, et la photo de sa carte de visite centrée horizontalement sous ses informations." },
+      { text: "Bitmap sampling (inSampleSize + RGB_565) pour alléger les photos", detail: "Les photos de cartes sont décodées avec un inSampleSize calculé et en RGB_565 pour diviser leur empreinte mémoire, évitant les OutOfMemoryError lors de la génération du rapport." },
+      { text: "PDF produit en mémoire (ByteArray) → pièce jointe de l'email", detail: "Le document est écrit dans un ByteArrayOutputStream puis joint directement au message SMTP, sans passer par un fichier temporaire sur le disque." },
+    ],
+  },
+  {
     id: 'admin',
     section: 'Fonctionnalités',
     title: 'Panel administrateur',
@@ -444,7 +457,7 @@ const SLIDES: Slide[] = [
     points: [
       { text: "Fullscreen avec system bars masquées (WindowInsetsController)", detail: "WindowInsetsController.hide(WindowInsetsCompat.Type.systemBars()) masque la barre de statut et la barre de navigation. Le mode BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE permet un retour temporaire si nécessaire." },
       { text: "FLAG_KEEP_SCREEN_ON — écran toujours allumé", detail: "window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) est appelé dans onCreate() de MainActivity. Le flag est retiré dans onDestroy() pour respecter les bonnes pratiques de gestion batterie." },
-      { text: "Orientation paysage forcée (idéal tablette 10\")", detail: "screenOrientation=\"landscape\" dans le Manifest empêche toute rotation. Sur une tablette Samsung 10\" ou Lenovo Tab, le mode paysage offre un ratio 16:9 idéal pour la navigation catalogue et les vidéos." },
+      { text: "Orientation portrait verrouillée (cohérence d'affichage sur stand)", detail: "screenOrientation=\"portrait\" dans le Manifest empêche toute rotation. L'affichage reste cohérent quelle que soit la prise en main de la tablette, sans bascule intempestive pendant la présentation." },
       { text: "Navigation limitée — pas de retour OS possible depuis la démo", detail: "En mode présentation plein écran, la barre de navigation Android est masquée. Le visiteur est guidé uniquement par la BottomNavBar de l'app — il ne peut pas accéder à l'écran d'accueil Android par accident." },
       { text: "Adapté à un usage sur stand sans surveillance constante", detail: "La tablette peut rester posée sur le stand en libre accès. Sans accès aux fonctions OS et avec l'écran toujours allumé sur l'accueil SMP, l'expérience reste cohérente et professionnelle sans intervention du commercial." },
     ],
@@ -490,15 +503,41 @@ const SLIDES: Slide[] = [
     ],
   },
   {
+    id: 'permissions',
+    section: 'Qualité',
+    title: 'Permissions & accès système',
+    subtitle: 'Principe du moindre privilège',
+    points: [
+      { text: "INTERNET + ACCESS_NETWORK_STATE — envoi SMTP", detail: "Seules les permissions réseau strictement nécessaires à l'envoi des contacts par email sont déclarées — l'app reste hors ligne le reste du temps." },
+      { text: "CAMERA déclarée en feature optionnelle (required = false)", detail: "uses-feature android.hardware.camera required=\"false\" : l'app reste installable sur un appareil sans caméra, la capture de carte de visite étant alors simplement désactivée." },
+      { text: "READ_MEDIA_IMAGES / READ_MEDIA_VIDEO — médias Android 13+", detail: "Sur Android 13+ (API 33), les permissions média granulaires remplacent l'accès global au stockage, conformément au modèle de permissions moderne d'Android." },
+      { text: "READ/WRITE_EXTERNAL_STORAGE limitées via maxSdkVersion (scoped storage)", detail: "Ces permissions héritées sont bornées par maxSdkVersion (29 / 32) : au-delà, l'app s'appuie sur le scoped storage et n'a plus besoin d'accès large au stockage." },
+      { text: "FileProvider — partage de fichiers sans exposer les chemins réels", detail: "FileProvider génère des URI content:// temporaires à permissions limitées, évitant d'exposer les chemins absolus du stockage interne lors du partage de l'export." },
+    ],
+  },
+  {
     id: 'tests',
     section: 'Qualité',
     title: 'Tests',
     points: [
-      { text: "JUnit 4/5 — tests unitaires des ViewModels et Repositories", detail: "Les ViewModels sont testés avec JUnit 5 en pur JVM : on injecte de faux Repository via Mockk, on appelle les méthodes du ViewModel et on vérifie les émissions du StateFlow sans démarrer d'émulateur Android." },
-      { text: "Mockk — mocking des interfaces Repository sans dépendance Room", detail: "Mockk permet de mocker les interfaces Repository avec une syntaxe Kotlin fluente : coEvery { contactRepository.getAllContacts() } returns flowOf(fakeContacts). Les coroutines sont gérées avec runTest de kotlinx-coroutines-test.", image: '/oral/code/mockk-test.png' },
-      { text: "Turbine — test des flux Kotlin Flow (émissions, completions)", detail: "Turbine est une extension de test pour Kotlin Flow : flow.test { awaitItem() } permet d'attendre et d'asserter chaque émission séquentiellement, y compris les erreurs et les completions, sans race conditions." },
-      { text: "Tests d'intégration Room — InstrumentedTest sur base en mémoire", detail: "Les DAOs Room sont testés avec une base in-memory (Room.inMemoryDatabaseBuilder) dans des tests instrumentés Android. Cela valide les requêtes SQL réelles sans persister de données entre les tests." },
-      { text: "Architecture Clean — chaque couche testable indépendamment", detail: "La séparation en couches (Domain, Data, Presentation) permet de tester chacune sans les autres : Domain en JUnit pur, Data avec des mocks Room en mémoire, Presentation avec des faux Repository Mockk." },
+      { text: "JUnit 5 (Jupiter) — tests unitaires via useJUnitPlatform()", detail: "Le projet est configuré pour exécuter ses tests sur la plateforme JUnit 5 (Jupiter) — testOptions { unitTests.all { it.useJUnitPlatform() } } — en pur JVM, sans démarrer d'émulateur Android." },
+      { text: "ContactHistoryViewModelTest — 5 cas couverts", detail: "Les tests vérifient le calcul des compteurs par statut, le filtrage de recherche, le cas d'une recherche vide, la délégation de suppression au repository et la détection d'une configuration SMTP complète." },
+      { text: "Mockk — mocking des interfaces Repository (aucune dépendance Room)", detail: "Mockk simule ContactRepository et AppSettingRepository avec une syntaxe Kotlin fluente : every { repo.getAllContacts() } returns flowOf(fakeContacts). Aucune base Room n'est nécessaire pour ces tests." },
+      { text: "Turbine + coroutines-test — vérification des émissions StateFlow", detail: "runTest et StandardTestDispatcher contrôlent le temps virtuel des coroutines ; Turbine (uiState.test { awaitItem() }) permet d'asserter chaque émission du StateFlow séquentiellement, sans race condition." },
+      { text: "Architecture Clean — ViewModels testables sans émulateur Android", detail: "La séparation Domain / Data / Presentation permet d'isoler les couches : on injecte de faux Repository et on observe les états UI exposés par le ViewModel, le tout sur la JVM uniquement." },
+    ],
+  },
+  {
+    id: 'qualite-bugs',
+    section: 'Qualité',
+    title: 'Démarche qualité — corrections de bugs',
+    subtitle: 'Traçabilité des corrections dans le code',
+    points: [
+      { text: "Bug #3 — validation du champ « nom du contact »", detail: "La validation du nom de l'interlocuteur a été ajoutée au formulaire de contact (ContactViewModel) pour éviter d'enregistrer des leads incomplets lors des salons." },
+      { text: "Bug #6 — config SMTP centralisée dans Room (source unique)", detail: "La configuration SMTP était dupliquée ; elle est désormais lue depuis APP_SETTINGS dans Room comme source de vérité unique, injectée via AppSettingRepository — un refactor touchant 4 fichiers." },
+      { text: "Bug #7 — navigation par constantes Screen.route", detail: "Les chaînes de route codées en dur ont été remplacées par les constantes typées (Screen.PdfViewer.route), supprimant un risque d'incohérence entre destinations de navigation." },
+      { text: "Bug #8 — DatabaseSeeder vérifie le nombre total de catégories", detail: "Le seeding initial ne testait que la présence de « Pharmacie » ; il compte maintenant le nombre total de catégories pour décider d'initialiser la base, évitant un état partiellement peuplé." },
+      { text: "→ Itération, revue de code et rigueur de débogage", detail: "Cette traçabilité numérotée des corrections illustre une démarche qualité continue : identifier, corriger et documenter chaque régression au fil du développement." },
     ],
   },
   {
@@ -551,6 +590,35 @@ const SLIDES: Slide[] = [
       { text: "Jakarta Mail (Angus Mail) — supporte SSL/TLS et authentification", detail: "Angus Mail 2.0.2 est l'implémentation Jakarta Mail officielle, compatible Android. Elle gère SSL/TLS (port 465 et 587), l'authentification SMTP (LOGIN, PLAIN, OAuth2) et le contenu MIME multipart pour les pièces jointes." },
       { text: "Gestion des erreurs : timeout, auth failure, SSL handshake", detail: "EmailService wrappe l'envoi dans un try/catch catchant MessagingException. Les codes d'erreur spécifiques (535 = mauvais identifiants, timeout = réseau indisponible) sont traduits en messages utilisateur compréhensibles." },
       { text: "→ Envoi fiable avec feedback utilisateur en cas d'erreur", detail: "ExportViewModel expose un UiState (Sending, Success, Error(message)) observé par ExportScreen. Un Snackbar Material 3 affiche le résultat immédiatement — l'admin sait exactement si l'envoi a réussi ou pourquoi il a échoué." },
+    ],
+  },
+  {
+    id: 'code-smtp',
+    section: 'Défis',
+    title: 'Extrait de code — Envoi SMTP',
+    subtitle: 'EmailService.kt — choix SSL / STARTTLS sur Dispatchers.IO',
+    points: [
+      { text: "Port 465 → SSL direct · sinon STARTTLS requis", detail: "Le service choisit dynamiquement le mode de chiffrement : SSL/TLS implicite sur le port 465, sinon STARTTLS explicite (587). Les deux garantissent un transport chiffré des identifiants et du contenu." },
+      { text: "Timeouts (15 s) pour éviter le blocage sur réseau lent", detail: "Des timeouts de connexion, lecture et écriture à 15 s empêchent l'app de rester figée sur un réseau de salon instable — l'utilisateur reçoit une erreur exploitable plutôt qu'un gel." },
+      {
+        text: "Tout l'envoi exécuté sur Dispatchers.IO, hors du thread principal",
+        detail: "withContext(Dispatchers.IO) déporte l'I/O réseau hors du thread UI, comme l'impose Android — sans quoi une NetworkOnMainThreadException serait levée.",
+        code: `suspend fun sendContacts(...) = withContext(Dispatchers.IO) {
+    val useSSL = smtpPort == "465"
+    val properties = Properties().apply {
+        put("mail.smtp.host", smtpHost)
+        put("mail.smtp.port", smtpPort)
+        put("mail.smtp.auth", "true")
+        put("mail.smtp.connectiontimeout", "15000")
+        if (useSSL) {
+            put("mail.smtp.ssl.enable", "true")
+        } else {
+            put("mail.smtp.starttls.required", "true")
+        }
+    }
+    Transport.send(buildMessage(session, contacts))
+}`,
+      },
     ],
   },
   {
@@ -756,6 +824,20 @@ const SLIDES: Slide[] = [
   },
 
   // ── 8. BILAN ──────────────────────────────────────────────────────────────
+  {
+    id: 'chiffres-cles',
+    section: 'Bilan',
+    title: 'Chiffres clés du projet',
+    subtitle: 'Le projet en quelques mesures',
+    points: [
+      { text: "~9 700 lignes de Kotlin réparties sur 70 fichiers", detail: "Une base de code conséquente mais structurée, organisée en couches Domain / Data / Presentation suivant l'architecture Clean." },
+      { text: "13 écrans · 7 ViewModels · 5 repositories · 5 DAOs · 5 entités Room", detail: "Chaque écran majeur possède son ViewModel ; chaque entité métier son repository (interface + implémentation) et son DAO Room, pour un découplage strict." },
+      { text: "3 modules d'injection de dépendances (Koin)", detail: "DatabaseModule, RepositoryModule et ViewModelModule câblent l'ensemble des dépendances sans couplage direct entre les couches." },
+      { text: "10+ librairies Android majeures intégrées", detail: "Compose, Room, Koin, CameraX, ExoPlayer, Coil, WebKit, Jakarta Mail, ML Kit Translate… autant d'intégrations maîtrisées dans un même projet." },
+      { text: "compileSdk 36 · minSdk 24 · targetSdk 35 · version 1.0.0", detail: "Une cible moderne (Android 15) tout en conservant une compatibilité large à partir d'Android 7.0, couvrant la quasi-totalité du parc d'appareils." },
+      { text: "1 APK release signé livré en production", detail: "Le projet a abouti à un livrable concret : un APK release signé avec keystore, effectivement déployé et utilisé sur les stands." },
+    ],
+  },
   {
     id: 'bilan-technique',
     section: 'Bilan',

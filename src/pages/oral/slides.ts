@@ -251,7 +251,14 @@ private fun loadContacts() {
       { text: "DatabaseModule — Room AppDatabase, tous les DAOs", detail: "Déclare l'AppDatabase en singleton et expose chaque DAO (contactDao, productDao, categoryDao...) comme dépendance injectable. La base est créée une seule fois à l'init de l'app." },
       { text: "RepositoryModule — lie interfaces Domain aux implémentations Data", detail: "Koin mappe chaque interface du Domain vers son implémentation Data : bind<ContactRepository>() { ContactRepositoryImpl(get()) }. Le ViewModel ne voit jamais l'implémentation concrète.", image: '/oral/code/koin-modules.png' },
       { text: "ViewModelModule — ViewModels de chaque écran", detail: "Chaque ViewModel est déclaré avec viewModel { ... } pour que Koin le crée et le détruise selon le cycle de vie Android, avec injection automatique des dépendances Repository." },
-      { text: "→ Aucun couplage direct entre couches, mocks faciles en test", detail: "En test, il suffit de remplacer un module Koin par un module de test injectant des faux Repository — sans modifier une ligne de code de production." },
+      { text: "→ Aucun couplage direct entre couches, mocks faciles en test", detail: "En test, il suffit de remplacer un module Koin par un module de test injectant des faux Repository — sans modifier une ligne de code de production.", code: `// Koin lie chaque interface (domain) à son implémentation (data).
+val repositoryModule = module {
+    single<ContactRepository>    { ContactRepositoryImpl(get()) }   // get() → ContactDao
+    single<ProductRepository>    { ProductRepositoryImpl(get()) }
+    single<CategoryRepository>   { CategoryRepositoryImpl(get()) }
+    single<AppSettingRepository> { AppSettingRepositoryImpl(get()) }
+    single<MediaFileRepository>  { MediaFileRepositoryImpl(get()) }
+}` },
     ],
   },
 
@@ -301,7 +308,20 @@ private fun loadContacts() {
     title: 'Navigation & architecture UI',
     points: [
       { text: "Single-Activity — un seul MainActivity, tout en Compose", detail: "Le pattern Single-Activity est la recommandation officielle Google avec Compose. Une seule Activity héberge tout le NavGraph — pas de FragmentManager, pas de back stack complexe à gérer." },
-      { text: "Jetpack Navigation Compose 2.8.5 — NavGraph typé", detail: "Navigation Compose 2.8.5 introduit les routes typées (type-safe navigation) via des sealed classes Screen. Les arguments passés entre écrans sont validés à la compilation, plus de StringExtra." },
+      { text: "Jetpack Navigation Compose 2.8.5 — NavGraph typé", detail: "Navigation Compose 2.8.5 introduit les routes typées (type-safe navigation) via des sealed classes Screen. Les arguments passés entre écrans sont validés à la compilation, plus de StringExtra.", code: `NavHost(navController, startDestination = Screen.Accueil.route) {
+    composable(Screen.Accueil.route)   { AccueilScreen(navController) }
+    composable(Screen.Catalogue.route) { CatalogueScreen(navController) }
+
+    composable(
+        route = Screen.ProductList.route,
+        arguments = listOf(navArgument("categoryId") {
+            type = NavType.LongType; defaultValue = 0L
+        }),
+    ) { entry ->
+        val id = entry.arguments?.getLong("categoryId") ?: 0L
+        ProductListScreen(navController, categoryId = id)
+    }
+}` },
       { text: "BottomNavBar — Accueil · Catalogue · Contact · Export", detail: "La barre de navigation inférieure (SMPNavigationBar.kt) utilise NavigationBar de Material 3 avec 4 destinations. L'onglet actif est mis en surbrillance via currentBackStackEntry observé en StateFlow." },
       { text: "SMPHeader — barre supérieure unifiée avec accès admin", detail: "SMPHeader.kt est un composable partagé affiché sur tous les écrans. Il expose un bouton d'accès discret au mode admin et le nom de l'écran courant, garantissant une cohérence visuelle globale." },
       { text: "Portrait verrouillé — orientation fixe pour un affichage cohérent", detail: "L'orientation est verrouillée en portrait dans le Manifest via screenOrientation=\"portrait\", garantissant un affichage identique quelle que soit la manipulation de la tablette sur le stand." },
@@ -388,7 +408,20 @@ private fun loadContacts() {
     subtitle: 'CameraX 1.3.1',
     points: [
       { text: "CameraCapture.kt — composable réutilisable", detail: "CameraCapture.kt est un composable autonome qui gère toute la logique caméra : demande de permission, preview en direct, capture et retour du chemin du fichier via callback." },
-      { text: "Preview en direct + capture JPEG", detail: "La Preview CameraX affiche le flux caméra en temps réel dans un AndroidView intégré à Compose. ImageCapture déclenche la capture sur bouton et sauvegarde le fichier JPEG dans le stockage interne." },
+      { text: "Preview en direct + capture JPEG", detail: "La Preview CameraX affiche le flux caméra en temps réel dans un AndroidView intégré à Compose. ImageCapture déclenche la capture sur bouton et sauvegarde le fichier JPEG dans le stockage interne.", code: `val preview = remember { Preview.Builder().build() }
+val previewView = remember { PreviewView(context) }
+val imageCapture = remember { ImageCapture.Builder().build() }
+
+LaunchedEffect(Unit) {
+    val provider = ProcessCameraProvider.getInstance(context).get()
+    preview.setSurfaceProvider(previewView.surfaceProvider)
+    provider.unbindAll()
+    provider.bindToLifecycle(
+        lifecycleOwner,
+        CameraSelector.DEFAULT_BACK_CAMERA,
+        preview, imageCapture,
+    )
+}` },
       { text: "Redimensionnement bitmap pour optimiser le stockage", detail: "Après capture, le bitmap est redimensionné à 800×600 max via BitmapFactory.Options(inSampleSize). Cela réduit la taille de 5-8 Mo (photo brute) à ~200 Ko sans perte de lisibilité." },
       { text: "Chemin stocké dans Contact.photoPath (Room)", detail: "Le chemin absolu du fichier JPEG est stocké dans la colonne photoPath de la table CONTACTS. ContactDetailDialog charge la photo via Coil en utilisant ce chemin pour afficher la carte de visite." },
       { text: "Permission CAMERA déclarée dans le Manifest", detail: "La permission CAMERA est déclarée dans AndroidManifest.xml. CameraCapture vérifie son état via PermissionState de Accompanist et affiche un dialogue explicatif si elle n'est pas encore accordée." },
@@ -463,7 +496,24 @@ private fun loadContacts() {
     subtitle: 'Présentation immersive en salon',
     points: [
       { text: "Fullscreen avec system bars masquées (WindowInsetsController)", detail: "WindowInsetsController.hide(WindowInsetsCompat.Type.systemBars()) masque la barre de statut et la barre de navigation. Le mode BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE permet un retour temporaire si nécessaire." },
-      { text: "FLAG_KEEP_SCREEN_ON — écran toujours allumé", detail: "window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) est appelé dans onCreate() de MainActivity. Le flag est retiré dans onDestroy() pour respecter les bonnes pratiques de gestion batterie." },
+      { text: "FLAG_KEEP_SCREEN_ON — écran toujours allumé", detail: "window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) est appelé dans onCreate() de MainActivity. Le flag est retiré dans onDestroy() pour respecter les bonnes pratiques de gestion batterie.", code: `override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    keepScreenOn()   // écran toujours allumé (tablette kiosque)
+    hideSystemUI()   // plein écran immersif
+    setContent { SMPApp() }
+}
+
+private fun keepScreenOn() {
+    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+}
+
+private fun hideSystemUI() {
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    WindowInsetsControllerCompat(window, window.decorView).apply {
+        hide(WindowInsetsCompat.Type.systemBars())
+        systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+}` },
       { text: "Orientation portrait verrouillée (cohérence d'affichage sur stand)", detail: "screenOrientation=\"portrait\" dans le Manifest empêche toute rotation. L'affichage reste cohérent quelle que soit la prise en main de la tablette, sans bascule intempestive pendant la présentation." },
       { text: "Navigation limitée — pas de retour OS possible depuis la démo", detail: "En mode présentation plein écran, la barre de navigation Android est masquée. Le visiteur est guidé uniquement par la BottomNavBar de l'app — il ne peut pas accéder à l'écran d'accueil Android par accident." },
       { text: "Adapté à un usage sur stand sans surveillance constante", detail: "La tablette peut rester posée sur le stand en libre accès. Sans accès aux fonctions OS et avec l'écran toujours allumé sur l'accueil SMP, l'expérience reste cohérente et professionnelle sans intervention du commercial." },
@@ -475,7 +525,22 @@ private fun loadContacts() {
     title: 'Support multilingue',
     subtitle: 'ML Kit Translate — on-device',
     points: [
-      { text: "ML Kit Translate 17.0.3 — traduction sans réseau", detail: "ML Kit Translate télécharge et met en cache des modèles de traduction compacts sur l'appareil. Une fois téléchargés, toutes les traductions FR↔EN, FR↔DE sont effectuées localement, sans aucune requête réseau." },
+      { text: "ML Kit Translate 17.0.3 — traduction sans réseau", detail: "ML Kit Translate télécharge et met en cache des modèles de traduction compacts sur l'appareil. Une fois téléchargés, toutes les traductions FR↔EN, FR↔DE sont effectuées localement, sans aucune requête réseau.", code: `suspend fun translate(text: String, source: String, target: String): String {
+    val options = TranslatorOptions.Builder()
+        .setSourceLanguage(toMlKitCode(source))
+        .setTargetLanguage(toMlKitCode(target))
+        .build()
+    val translator = Translation.getClient(options)
+
+    return suspendCancellableCoroutine { cont ->
+        translator.downloadModelIfNeeded()       // modèle ~15 Mo, on-device
+            .addOnSuccessListener {
+                translator.translate(text)
+                    .addOnSuccessListener { cont.resume(it) }
+                    .addOnFailureListener { cont.resume("") }
+            }
+    }
+}` },
       { text: "LanguageManager — gestion de la langue active", detail: "LanguageManager est un singleton Koin qui expose un StateFlow<Language> observé par tous les composables. Changer de langue déclenche une recomposition globale de l'UI sans redémarrer l'application." },
       { text: "ContentManager — surcharge dynamique des chaînes", detail: "ContentManager stocke les traductions personnalisées (overrides admin) dans la table APP_SETTINGS sous des clés typées (ex: home.title.fr, home.title.en). Ces overrides prennent priorité sur les traductions ML Kit." },
       { text: "Localization.kt — système de chaînes localisées", detail: "Localization.kt définit toutes les chaînes de l'UI pour les 3 langues dans un sealed class typé. Cela évite les fichiers strings.xml multiples Android et permet une gestion programmatique des traductions." },
@@ -553,7 +618,18 @@ private fun loadContacts() {
     title: 'Performances',
     points: [
       { text: "Coil — cache mémoire + disque pour images, chargement lazy", detail: "Coil maintient un cache LRU en mémoire (taille automatique basée sur la RAM disponible) et un cache disque persistant entre sessions. Les images ne sont décodées qu'à la taille réelle de l'ImageView — économie CPU et RAM." },
-      { text: "Filament — rendu 3D GPU-accéléré, hors du thread principal", detail: "Filament (moteur de rendu PBR de Google) exécute tout le rendu sur le GPU via OpenGL ES 3.0. Les modèles 3D sont chargés asynchroniquement sur un thread dédié, préservant la fluidité de l'UI Compose à 60fps." },
+      { text: "Filament — rendu 3D GPU-accéléré, hors du thread principal", detail: "Filament (moteur de rendu PBR de Google) exécute tout le rendu sur le GPU via OpenGL ES 3.0. Les modèles 3D sont chargés asynchroniquement sur un thread dédié, préservant la fluidité de l'UI Compose à 60fps.", code: `private val frameCallback = object : Choreographer.FrameCallback {
+    override fun doFrame(frameTimeNanos: Long) {
+        choreographer.postFrameCallback(this)
+        modelViewer.render(frameTimeNanos)   // rendu GPU à chaque frame
+    }
+}
+
+private fun setupFilament() {
+    Utils.init()
+    modelViewer = ModelViewer(surfaceView)
+    loadEnvironment()   // IBL + skybox → éclairage PBR réaliste
+}` },
       { text: "Kotlin Coroutines — toutes les I/O sur Dispatchers.IO", detail: "Dispatchers.IO est un pool de threads optimisé pour les opérations bloquantes (fichiers, réseau, base de données). Toutes les opérations Room, FileProvider et Jakarta Mail y sont exécutées via withContext(Dispatchers.IO)." },
       { text: "Room Flow — mises à jour UI réactives sans polling", detail: "Les requêtes Room annotées @Query retournant Flow<T> s'appuient sur SQLite triggers internes. Room détecte chaque INSERT/UPDATE/DELETE et notifie automatiquement les collectors — zéro polling, zéro latence.", image: '/oral/code/room-flow1.png' },
       { text: "Large heap activé pour la gestion des médias lourds", detail: "android:largeHeap=\"true\" dans le Manifest demande à Android un heap élargi pour l'application. Indispensable pour Filament qui charge des meshes 3D et des textures haute résolution simultanément en mémoire." },
@@ -922,14 +998,16 @@ export type Step =
   | { kind: 'overview'; slideIndex: number }
   | { kind: 'zoom'; slideIndex: number; pointIndex: number }
 
+function isVisual(point: SlidePoint): boolean {
+  return !!(point.image || point.video || point.code || point.diagram)
+}
+
 export function generateSteps(slides: Slide[]): Step[] {
   return slides.flatMap((slide, slideIndex) => [
     { kind: 'overview' as const, slideIndex },
-    ...slide.points.map((_, pointIndex) => ({
-      kind: 'zoom' as const,
-      slideIndex,
-      pointIndex,
-    })),
+    ...slide.points.flatMap((point, pointIndex) =>
+      isVisual(point) ? [{ kind: 'zoom' as const, slideIndex, pointIndex }] : [],
+    ),
   ])
 }
 

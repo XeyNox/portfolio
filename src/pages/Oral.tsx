@@ -947,14 +947,14 @@ function ZoomSlide({ slide, pointIndex }: ZoomSlideProps) {
           <div className="flex items-center justify-center">
             {point.image && (
               <img
-                src={point.image}
+                src={`${import.meta.env.BASE_URL}${point.image.replace(/^\//, '')}`}
                 alt={point.text}
                 className="max-h-[60vh] w-full object-contain rounded-lg"
               />
             )}
             {point.video && (
               <video
-                src={point.video}
+                src={`${import.meta.env.BASE_URL}${point.video.replace(/^\//, '')}`}
                 controls
                 className="max-h-[60vh] w-full rounded-lg"
               />

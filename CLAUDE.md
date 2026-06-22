@@ -30,7 +30,7 @@ Single-page portfolio built with React 18 + TypeScript + Vite + TailwindCSS, dep
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **portfolio** (79 symbols, 98 relationships, 0 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **portfolio** (179 symbols, 251 relationships, 4 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 

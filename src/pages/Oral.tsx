@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { SLIDES, SECTIONS, STEPS } from './oral/slides'
 import SlideView from './oral/SlideView'
+import { useOralSync } from './oral/useOralSync'
 
 export default function Oral() {
-  const [stepIndex, setStepIndex] = useState(0)
+  const [stepIndex, setStepIndex] = useOralSync(0)
 
-  const prev = useCallback(() => setStepIndex(i => Math.max(0, i - 1)), [])
-  const next = useCallback(() => setStepIndex(i => Math.min(STEPS.length - 1, i + 1)), [])
+  const prev = useCallback(() => setStepIndex(Math.max(0, stepIndex - 1)), [stepIndex, setStepIndex])
+  const next = useCallback(
+    () => setStepIndex(Math.min(STEPS.length - 1, stepIndex + 1)),
+    [stepIndex, setStepIndex],
+  )
 
   const step = STEPS[stepIndex]
   const slide = SLIDES[step.slideIndex]
@@ -31,9 +35,14 @@ export default function Oral() {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col">
       {/* Top bar */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
-        <Link to="/" className="font-mono text-xs text-zinc-500 hover:text-[#e8ff00] transition-colors">
-          ← Portfolio
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/" className="font-mono text-xs text-zinc-500 hover:text-[#e8ff00] transition-colors">
+            ← Portfolio
+          </Link>
+          <Link to="/oral/presenter" className="font-mono text-xs text-zinc-500 hover:text-[#e8ff00] transition-colors">
+            Présentateur ↗
+          </Link>
+        </div>
         <div className="flex items-center gap-6">
           {/* Section indicators */}
           <div className="hidden md:flex items-center gap-1.5">

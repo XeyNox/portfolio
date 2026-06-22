@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import Oral, { generateSteps, STEPS } from '../pages/Oral'
+import Oral from '../pages/Oral'
+import { generateSteps, STEPS } from '../pages/oral/slides'
 
 describe('generateSteps', () => {
   it('produces one overview step per slide', () => {

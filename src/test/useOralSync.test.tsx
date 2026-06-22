@@ -1,6 +1,9 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, afterEach } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import { useOralSync } from '../pages/oral/useOralSync'
+
+// Capture original BroadcastChannel to restore after tests.
+const ORIGINAL_BROADCAST_CHANNEL = globalThis.BroadcastChannel
 
 // Minimal in-process BroadcastChannel so two hook instances talk to each other.
 class FakeChannel {
@@ -18,6 +21,10 @@ class FakeChannel {
 beforeEach(() => {
   FakeChannel.channels = []
   ;(globalThis as { BroadcastChannel: unknown }).BroadcastChannel = FakeChannel
+})
+
+afterEach(() => {
+  ;(globalThis as { BroadcastChannel: unknown }).BroadcastChannel = ORIGINAL_BROADCAST_CHANNEL
 })
 
 describe('useOralSync', () => {

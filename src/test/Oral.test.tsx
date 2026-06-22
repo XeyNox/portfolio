@@ -16,19 +16,41 @@ describe('generateSteps', () => {
     expect(overviews).toHaveLength(2)
   })
 
-  it('produces one zoom step per point', () => {
+  it('produces no zoom step for a text-only slide', () => {
     const slides = [
       { id: 'a', section: 'S', title: 'T', points: [{ text: 'p1' }, { text: 'p2' }] },
-      { id: 'b', section: 'S', title: 'T2', points: [{ text: 'p3' }] },
     ]
-    const steps = generateSteps(slides)
-    const zooms = steps.filter(s => s.kind === 'zoom')
-    expect(zooms).toHaveLength(3)
+    const zooms = generateSteps(slides).filter(s => s.kind === 'zoom')
+    expect(zooms).toHaveLength(0)
   })
 
-  it('orders overview before its zoom steps', () => {
+  it('produces a zoom step only for points that have a visual', () => {
     const slides = [
-      { id: 'a', section: 'S', title: 'T', points: [{ text: 'p1' }, { text: 'p2' }] },
+      {
+        id: 'a',
+        section: 'S',
+        title: 'T',
+        points: [
+          { text: 'img', image: '/a.png' },
+          { text: 'vid', video: '/a.mp4' },
+          { text: 'code', code: 'x' },
+          { text: 'diag', diagram: 'db' as const },
+          { text: 'plain' },
+        ],
+      },
+    ]
+    const zooms = generateSteps(slides).filter(s => s.kind === 'zoom')
+    expect(zooms).toHaveLength(4)
+  })
+
+  it('orders the overview before its zoom steps', () => {
+    const slides = [
+      {
+        id: 'a',
+        section: 'S',
+        title: 'T',
+        points: [{ text: 'p1', image: '/a.png' }, { text: 'p2', code: 'x' }],
+      },
     ]
     const steps = generateSteps(slides)
     expect(steps[0]).toMatchObject({ kind: 'overview', slideIndex: 0 })
@@ -56,10 +78,10 @@ describe('Oral', () => {
     expect(screen.getByText(/^01\s*\/\s*\d+$/)).toBeInTheDocument()
   })
 
-  it('navigates to zoom of first point after one click', async () => {
+  it('navigates to the next slide after one click (first slide has no visual points)', async () => {
     renderOral()
     await userEvent.click(screen.getByRole('button', { name: 'Diapositive suivante' }))
-    expect(screen.getByText('Loic Michaud')).toBeInTheDocument()
+    expect(screen.getByText('SMP Moules')).toBeInTheDocument()
   })
 
   it('disables the prev button on the first slide', () => {

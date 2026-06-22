@@ -922,14 +922,16 @@ export type Step =
   | { kind: 'overview'; slideIndex: number }
   | { kind: 'zoom'; slideIndex: number; pointIndex: number }
 
+function isVisual(point: SlidePoint): boolean {
+  return !!(point.image || point.video || point.code || point.diagram)
+}
+
 export function generateSteps(slides: Slide[]): Step[] {
   return slides.flatMap((slide, slideIndex) => [
     { kind: 'overview' as const, slideIndex },
-    ...slide.points.map((_, pointIndex) => ({
-      kind: 'zoom' as const,
-      slideIndex,
-      pointIndex,
-    })),
+    ...slide.points.flatMap((point, pointIndex) =>
+      isVisual(point) ? [{ kind: 'zoom' as const, slideIndex, pointIndex }] : [],
+    ),
   ])
 }
 

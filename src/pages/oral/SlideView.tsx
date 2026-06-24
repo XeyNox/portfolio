@@ -73,9 +73,9 @@ function ZoomSlide({ slide, pointIndex }: { slide: Slide; pointIndex: number }) 
           {point.diagram === 'architecture' ? <ArchitectureDiagram /> : <DbSchemaDiagram />}
         </div>
       ) : hasCode ? (
-        <div className="grid grid-cols-2 gap-10 items-start">
-          <p className="text-2xl font-semibold text-zinc-100 leading-snug pt-2">{point.text}</p>
-          <pre className="bg-zinc-900 border border-zinc-700/60 rounded-xl p-5 text-sm text-[#e8ff00]/90 font-mono leading-relaxed overflow-auto max-h-[58vh] whitespace-pre">
+        <div className="flex flex-col gap-6">
+          <p className="text-2xl font-semibold text-zinc-100 leading-snug">{point.text}</p>
+          <pre className="bg-zinc-900 border border-zinc-700/60 rounded-xl p-5 text-[0.8rem] text-[#e8ff00]/90 font-mono leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap break-words">
             <code>{point.code}</code>
           </pre>
         </div>

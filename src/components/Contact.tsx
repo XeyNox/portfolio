@@ -16,7 +16,7 @@ export default function Contact() {
     e.preventDefault()
     const subject = encodeURIComponent(`Contact portfolio — ${form.name}`)
     const body = encodeURIComponent(`Nom : ${form.name}\nEmail : ${form.email}\n\n${form.message}`)
-    window.location.href = `mailto:ratonlaveur14052005@gmail.com?subject=${subject}&body=${body}`
+    window.location.href = `mailto:loic.michaud@proton.me?subject=${subject}&body=${body}`
     setSubmitted(true)
   }
 

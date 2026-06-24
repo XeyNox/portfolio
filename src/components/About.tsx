@@ -27,9 +27,6 @@ export default function About() {
             de bout en bout. J'aime travailler sur des problèmes complexes et transformer
             des idées en produits concrets qui ont un vrai impact.
           </p>
-          <p className="text-zinc-400 leading-relaxed text-sm">
-            Disponible pour des missions freelance ou des opportunités en CDI.
-          </p>
         </div>
 
         {/* Right — skills as a grid of pills */}

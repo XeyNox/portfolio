@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <a
-            href="https://github.com/raphtalia"
+            href="https://github.com/xeynox"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-[10px] tracking-widest text-zinc-600 uppercase hover:text-white transition-colors"

@@ -12,7 +12,7 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="https://linkedin.com"
+            href="www.linkedin.com/in/loic-michaud"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-[10px] tracking-widest text-zinc-600 uppercase hover:text-white transition-colors"

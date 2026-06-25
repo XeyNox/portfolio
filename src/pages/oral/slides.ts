@@ -204,15 +204,6 @@ export const SLIDES: Slide[] = [
       { text: "Data Layer — implémentations Room, DAOs, services (SMTP, email)", detail: "Le Data Layer implémente les interfaces du Domain : les DAOs Room accèdent à SQLite, et EmailService.kt gère l'envoi SMTP via Jakarta Mail sur Dispatchers.IO.", image: '/oral/code/contact-dao.png' },
       { text: "Presentation Layer — ViewModels, états UI, composables Compose", detail: "Les ViewModels exposent des StateFlow d'états UI immuables. Les composables Compose s'abonnent via collectAsStateWithLifecycle() et se recomposent uniquement si l'état change.", image: '/oral/code/viewmodel-stateflow.png' },
       { text: "→ Couplage faible, testabilité maximale, évolutivité", detail: "Chaque couche est testable indépendamment : le Domain en JUnit pur, le Data avec des bases Room en mémoire, et la Presentation avec des faux Repository via Mockk.", diagram: 'architecture' },
-    ],
-  },
-  {
-    id: 'schema-archi',
-    section: 'Conception',
-    title: 'Flux de données',
-    subtitle: 'MVVM avec StateFlow et Coroutines',
-    points: [
-      { text: "UI Compose — observe StateFlow via collectAsStateWithLifecycle()", detail: "collectAsStateWithLifecycle() arrête automatiquement la collecte quand le composable quitte le cycle de vie actif, évitant les fuites mémoire sur Android." },
       { text: "ViewModel — expose états UI, orchestre les cas d'usage", detail: "Le ViewModel transforme les données brutes du Repository en états UI consommables (UiState sealed class : Loading, Success, Error) et survit aux rotations d'écran.", code: `private val _uiState = MutableStateFlow(ContactHistoryUiState())
 val uiState: StateFlow<ContactHistoryUiState> = _uiState.asStateFlow()
 
@@ -223,9 +214,6 @@ private fun loadContacts() {
         }
     }
 }` },
-      { text: "Repository (interface) — contrat du Domain Layer", detail: "L'interface Repository définit le contrat métier sans détail d'implémentation. Le ViewModel n'a jamais connaissance de Room, SQL ou Jakarta Mail — uniquement de ce contrat." },
-      { text: "RepositoryImpl (data) — implémentation Room + services", detail: "L'implémentation concrète orchestre les DAOs Room, le cache et les services. Elle est injectée par Koin au lieu de l'interface, invisible pour le ViewModel." },
-      { text: "Room DAO → SQLite local — persistance offline-first", detail: "Room génère automatiquement le code SQL à la compilation via les annotations @Dao. Les requêtes retournent des Flow<List<T>> qui émettent automatiquement quand la base est modifiée." },
     ],
   },
   {
@@ -290,24 +278,16 @@ val repositoryModule = module {
   {
     id: 'stack-media',
     section: 'Stack',
-    title: 'Librairies multimédia',
+    title: 'Librairies & services',
     points: [
       { text: "CameraX 1.3.1 — capture photo de carte de visite", detail: "CameraX abstrait les différences entre les fabricants Android pour la gestion caméra. Elle expose une API unifiée de Preview, ImageCapture et ImageAnalysis compatible avec tous les appareils cibles." },
       { text: "Media3 ExoPlayer 1.2.1 — lecture vidéo", detail: "ExoPlayer est le player vidéo standard recommandé par Google. Il gère nativement le cycle de vie Android (pause en background), les formats MP4/WebM et s'intègre comme composable Compose." },
       { text: "Coil 2.5.0 — chargement et cache des images", detail: "Coil (Coroutine Image Loader) est conçu pour Kotlin et Compose. Il gère un cache deux niveaux (mémoire + disque), le chargement asynchrone et le redimensionnement à la demande." },
       { text: "AndroidX WebKit 1.12.1 — visualisation PDF", detail: "WebKit permet d'afficher des PDF via une WebView sécurisée avec accès aux fichiers locaux restreint par FileProvider. C'est la solution la plus légère sans dépendance externe de rendu PDF." },
-    ],
-  },
-  {
-    id: 'stack-services',
-    section: 'Stack',
-    title: 'Services & intégrations',
-    points: [
       { text: "Angus Mail (Jakarta Mail) 2.0.2 — envoi SMTP avec SSL/TLS", detail: "Jakarta Mail (anciennement JavaMail) est la référence pour l'envoi email en Java/Kotlin. Angus Mail est l'implémentation officielle de référence, compatible Gmail, Office 365 et serveurs SMTP personnalisés." },
       { text: "ML Kit Translate 17.0.3 — traduction multilingue on-device", detail: "ML Kit Translate télécharge des modèles de langue compacts (~15 Mo chacun) et effectue toutes les traductions localement sans envoyer de données à Google. Français, anglais et allemand sont supportés." },
       { text: "Android PdfDocument API — génération de rapports PDF", detail: "L'API native Android PdfDocument génère des PDF en dessinant sur un Canvas — textes, tableaux, logos. Aucune dépendance externe requise, les PDFs sont générés directement en mémoire." },
       { text: "kotlinx-serialization — sérialisation JSON (imagePaths en BDD)", detail: "kotlinx-serialization est la solution officielle Kotlin pour JSON. Elle est utilisée pour sérialiser les listes de chemins d'images (imagePaths) en colonne TEXT dans Room via un TypeConverter." },
-      { text: "JUnit 4/5 + Mockk + Turbine — tests unitaires et Flow", detail: "Mockk est l'alternative Kotlin à Mockito, avec une API fluente adaptée aux suspend functions. Turbine est une librairie de test dédiée aux Kotlin Flow, permettant de tester les émissions séquentiellement." },
     ],
   },
 
@@ -575,26 +555,14 @@ private fun hideSystemUI() {
   {
     id: 'securite',
     section: 'Qualité',
-    title: 'Sécurité',
+    title: 'Sécurité & permissions',
     points: [
       { text: "Keystore signé (mon-app.jks) — APK release signé", detail: "L'APK release est signé avec un keystore JKS généré via Android Studio. La signature garantit l'intégrité de l'application et est obligatoire pour toute distribution ou mise à jour — sans elle, Android refuse l'installation." },
       { text: "AndroidX FileProvider — partage sécurisé sans exposer les chemins", detail: "FileProvider génère des URI content:// temporaires avec permissions d'accès limitées dans le temps. Sans lui, partager un fichier depuis le stockage interne exposerait le chemin absolu, permettant à n'importe quelle app d'y accéder." },
       { text: "Aucun secret hardcodé — SMTP via interface admin uniquement", detail: "Aucun identifiant email, mot de passe SMTP ou clé API n'apparaît dans le code source. Toute configuration sensible est saisie par l'admin en runtime et stockée dans APP_SETTINGS — jamais dans les ressources de l'app." },
       { text: "ProGuard disponible en release (obfuscation du bytecode)", detail: "La configuration ProGuard/R8 est activée pour les builds release. Elle obfusque les noms de classes et méthodes dans le bytecode DEX, rendant la rétro-ingénierie de l'APK significativement plus difficile." },
       { text: "Permissions minimales déclarées dans le Manifest", detail: "Seules les permissions strictement nécessaires sont déclarées : INTERNET (envoi email), CAMERA (capture photo), READ_MEDIA_IMAGES/VIDEO (upload médias). Aucune permission de localisation, de contacts système ou d'appels téléphoniques." },
-    ],
-  },
-  {
-    id: 'permissions',
-    section: 'Qualité',
-    title: 'Permissions & accès système',
-    subtitle: 'Principe du moindre privilège',
-    points: [
-      { text: "INTERNET + ACCESS_NETWORK_STATE — envoi SMTP", detail: "Seules les permissions réseau strictement nécessaires à l'envoi des contacts par email sont déclarées — l'app reste hors ligne le reste du temps." },
       { text: "CAMERA déclarée en feature optionnelle (required = false)", detail: "uses-feature android.hardware.camera required=\"false\" : l'app reste installable sur un appareil sans caméra, la capture de carte de visite étant alors simplement désactivée." },
-      { text: "READ_MEDIA_IMAGES / READ_MEDIA_VIDEO — médias Android 13+", detail: "Sur Android 13+ (API 33), les permissions média granulaires remplacent l'accès global au stockage, conformément au modèle de permissions moderne d'Android." },
-      { text: "READ/WRITE_EXTERNAL_STORAGE limitées via maxSdkVersion (scoped storage)", detail: "Ces permissions héritées sont bornées par maxSdkVersion (29 / 32) : au-delà, l'app s'appuie sur le scoped storage et n'a plus besoin d'accès large au stockage." },
-      { text: "FileProvider — partage de fichiers sans exposer les chemins réels", detail: "FileProvider génère des URI content:// temporaires à permissions limitées, évitant d'exposer les chemins absolus du stockage interne lors du partage de l'export." },
     ],
   },
   {
@@ -972,7 +940,6 @@ private fun setupFilament() {
       { text: "Choix architecturaux justifiés : MVVM + Clean Architecture", detail: "MVVM pour séparer logique UI et métier, Clean Architecture pour isoler les couches et maximiser la testabilité. Le choix a été documenté avec comparaison MVC/MVP/MVVM et justification par les contraintes du projet." },
       { text: "Conception du schéma de base de données (5 entités, relations)", detail: "Modélisation en MLD avec clés étrangères (PRODUCTS.categoryId → CATEGORIES.id), cascade delete et choix délibéré de stocker imagePaths en JSON plutôt qu'une table de jonction supplémentaire." },
       { text: "Diagramme de navigation (NavGraph, 9 écrans)", detail: "NavGraph typé avec Screen sealed class définissant 12 routes. Le diagramme documente les transitions possibles, les arguments passés (categoryId, productId) et les écrans accessibles uniquement en mode admin." },
-      { text: "Choix des dépendances (Koin, Room, Filament) argumentés", detail: "Chaque dépendance a été évaluée sur 4 critères : performance, maintenance, compatibilité Android, courbe d'apprentissage. Koin > Hilt pour la légèreté, Room > SQLDelight pour l'intégration Jetpack officielle." },
     ],
   },
   {
@@ -984,7 +951,6 @@ private fun setupFilament() {
       { text: "Composants réutilisables : SMPHeader, SMPNavigationBar, CameraCapture", detail: "SMPHeader et SMPNavigationBar sont des composables partagés injectés dans tous les écrans via le NavGraph. CameraCapture.kt est un composable autonome réutilisable dans tout écran nécessitant la caméra." },
       { text: "Responsive design — phone / tablette avec ScreenType", detail: "ScreenType.PHONE et TABLET déclenchent des branches de rendu distinctes dans les composables (if (screenType == TABLET)). Les deux layouts sont maintenus dans le même fichier, garantissant la cohérence visuelle." },
       { text: "Mode kiosque fullscreen avec gestion des system bars", detail: "WindowInsetsController.hide() masque les barres système en mode présentation. BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE permet un retour fugace des barres si l'admin a besoin d'accéder aux paramètres système." },
-      { text: "Accessibilité : contrastes Material 3, sémantique Compose", detail: "Material 3 garantit des ratios de contraste WCAG AA sur tous les composants. Les éléments interactifs Compose ont des contentDescription pour les screen readers, et les composants focusables respectent la navigation au clavier." },
     ],
   },
   {
@@ -1015,7 +981,6 @@ interface ContactDao {
       { text: "TranslationService.kt — traduction ML Kit asynchrone", detail: "TranslationService wrappe l'API ML Kit Translate dans des suspend functions Kotlin. translate(text: String, from: Language, to: Language) retourne le texte traduit ou lance une TranslationException avec le code d'erreur ML Kit." },
       { text: "ContentManager.kt — gestion des contenus éditables", detail: "ContentManager maintient un Map<String, Map<Language, String>> chargé depuis APP_SETTINGS. getString(key, language) retourne la valeur localisée avec fallback hiérarchique : override admin > traduction ML Kit > valeur par défaut." },
       { text: "ExportViewModel — orchestration CSV + email", detail: "ExportViewModel coordonne le flux d'export complet via des coroutines : fetchContacts() → generateCsv() → generatePdf() → sendEmail(). Chaque étape met à jour un UiState (Loading, CsvReady, PdfReady, EmailSent, Error)." },
-      { text: "Pattern Repository — isolation de la logique d'accès aux données", detail: "Le pattern Repository isole les ViewModels de la source de données concrète. ContactRepository définit le contrat, ContactRepositoryImpl l'implémente avec Room. Tester le ViewModel = mocker l'interface, sans Room, sans émulateur." },
     ],
   },
   {
@@ -1027,7 +992,6 @@ interface ContactDao {
       { text: "Versioning Git avec branches feature / fix", detail: "Workflow git avec branches feature/nom-fonctionnalité et fix/nom-bug. Chaque feature est développée isolément et mergée via Pull Request après auto-review — permettant une traçabilité complète de l'historique." },
       { text: "Livraison d'APK signé et documenté (apk.md)", detail: "L'APK release est généré via Build > Generate Signed Bundle et signé avec le keystore mon-app.jks. apk.md documente la procédure d'installation, les permissions requises et les instructions de mise à jour pour l'équipe SMP." },
       { text: "Communication avec les utilisateurs métier (commerciaux)", detail: "Sessions régulières de démo avec les commerciaux pour recueillir les retours. Leurs observations (ex : besoin de voir l'historique par salon, pas seulement par date) ont directement influencé les priorités de développement." },
-      { text: "Documentation technique : README, CLAUDE.md, AGENTS.md", detail: "README.md documente l'architecture, la stack, les écrans et les procédures de build/signature. CLAUDE.md et AGENTS.md guident les outils IA pour contribuer au projet en respectant les conventions établies." },
     ],
   },
 
@@ -1060,13 +1024,15 @@ interface ContactDao {
   {
     id: 'bilan-technique',
     section: 'Bilan',
-    title: 'Bilan technique',
+    title: 'Bilan technique & personnel',
     points: [
       { text: "Application Android production-ready, APK signé livré", detail: "L'APK release signé a été installé sur les tablettes Samsung de SMP Moules et utilisé lors du salon Pharmapack 2026. Aucun crash ni bug bloquant n'a été remonté en production." },
       { text: "Architecture propre — chaque couche testable et évolutive", detail: "La séparation MVVM + Clean permet d'ajouter une fonctionnalité (ex : synchronisation cloud) sans toucher aux couches existantes. Le Domain Layer resterait identique, seule une nouvelle implémentation de Repository serait ajoutée." },
       { text: "Intégration de 10+ librairies Android majeures", detail: "Room, Compose, Koin, CameraX, ExoPlayer, Coil, Filament, Jakarta Mail, ML Kit, kotlinx-serialization — chacune intégrée avec sa configuration spécifique, ses migrations et ses contraintes de cycle de vie Android." },
       { text: "Première expérience significative de développement mobile natif", detail: "Avant ce projet, mon expérience mobile se limitait à quelques tutoriels. Ce projet m'a forcé à maîtriser le cycle de vie Android, la gestion des permissions, les threads et le rendu GPU — des concepts absents du développement web." },
       { text: "Compréhension approfondie du cycle de vie Android", detail: "Le débogage des fuites mémoire ExoPlayer et des crashes de rotation d'écran m'a contraint à comprendre en détail onCreate/onStart/onResume/onPause/onStop/onDestroy et les ViewModel qui survivent aux recreations d'Activity." },
+      { text: "Architecture logicielle : MVVM, Clean Architecture, DI", detail: "La vraie valeur de ces patterns ne se comprend qu'en pratique : le jour où j'ai pu tester ExportViewModel sans démarrer d'émulateur ni configurer Jakarta Mail, j'ai compris pourquoi l'isolation des couches est indispensable." },
+      { text: "Communication technique avec des parties prenantes non-développeurs", detail: "Expliquer à un commercial pourquoi une fonctionnalité nécessite 2 semaines plutôt que 2 heures, ou traduire un bug technique en impact utilisateur compréhensible, sont des compétences aussi importantes que le code lui-même." },
     ],
   },
   {
@@ -1079,18 +1045,6 @@ interface ContactDao {
       { text: "Export automatique des contacts via email", detail: "En un seul clic depuis l'écran Export, le responsable commercial reçoit par email un rapport PDF formaté avec tous les leads du salon, prêt à être importé dans le CRM de l'entreprise." },
       { text: "Autonomie : les commerciaux mettent à jour les contenus eux-mêmes", detail: "ContentManager.kt donne aux commerciaux le contrôle total du contenu sans dépendance au service IT. Ajouter un nouveau produit, modifier une description ou changer une photo prend moins de 2 minutes depuis la tablette." },
       { text: "Image moderne de l'entreprise lors des salons professionnels", detail: "La tablette kiosque avec son interface soignée, ses vidéos produit et son mode plein écran positionne SMP Moules comme une entreprise à la pointe de la technologie face à des concurrents utilisant encore des catalogues papier." },
-    ],
-  },
-  {
-    id: 'bilan-personnel',
-    section: 'Bilan',
-    title: "Ce que j'ai appris",
-    points: [
-      { text: "Maîtrise de Kotlin et Jetpack Compose en contexte réel", detail: "Kotlin 2.1.0 avec ses sealed classes, extension functions, coroutines et scope functions (let, apply, run) est devenu mon langage principal. Jetpack Compose avec ses recompositions et ses effets de bord est une façon de penser l'UI radicalement différente du web." },
-      { text: "Architecture logicielle : MVVM, Clean Architecture, DI", detail: "La vraie valeur de ces patterns ne se comprend qu'en pratique : le jour où j'ai pu tester ExportViewModel sans démarrer d'émulateur ni configurer Jakarta Mail, j'ai compris pourquoi l'isolation des couches est indispensable." },
-      { text: "Gestion des APIs hardware Android (CameraX, Filament, Permissions)", detail: "CameraX m'a appris les abstractions hardware nécessaires pour supporter des centaines de modèles Android différents. Filament m'a introduit au rendu physiquement basé et aux contraintes GPU sur des appareils embarqués." },
-      { text: "Rigueur sur la sécurité des données (RGPD, Keystore)", detail: "Implémenter la conformité RGPD m'a appris à penser la sécurité dès la conception (privacy by design) : minimisation des données, consentement explicite, absence de cloud non nécessaire. Le Keystore m'a initié à la signature cryptographique d'applications." },
-      { text: "Communication technique avec des parties prenantes non-développeurs", detail: "Expliquer à un commercial pourquoi une fonctionnalité nécessite 2 semaines plutôt que 2 heures, ou traduire un bug technique en impact utilisateur compréhensible, sont des compétences aussi importantes que le code lui-même." },
     ],
   },
   {

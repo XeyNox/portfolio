@@ -730,6 +730,29 @@ private fun setupFilament() {
     section: 'Insights',
     title: 'Room : Flow réactif vs one-shot',
     subtitle: 'Ce que les docs ne montrent pas',
+    visual: {
+      kind: 'compare',
+      columns: [
+        {
+          heading: 'Flow<T> — réactif',
+          rows: [
+            'Trigger SQLite interne',
+            'Re-émet à chaque INSERT/UPDATE/DELETE',
+            'UI synchronisée, zéro polling',
+            'Pour une liste qui doit rester à jour',
+          ],
+        },
+        {
+          heading: 'suspend fun — one-shot',
+          rows: [
+            "S'exécute une fois, retourne",
+            'Pas de collector à gérer',
+            'Pour une lecture unique (détail produit)',
+            'val id = 0 → sentinelle autoGenerate',
+          ],
+        },
+      ],
+    },
     points: [
       {
         text: 'fun getAllContacts(): Flow<List<Contact>> — requête réactive',
@@ -758,6 +781,29 @@ private fun setupFilament() {
     section: 'Insights',
     title: 'Coroutines : withContext vs launch',
     subtitle: 'La différence que les tutos ne précisent pas',
+    visual: {
+      kind: 'compare',
+      columns: [
+        {
+          heading: 'withContext(IO)',
+          rows: [
+            'Switch de thread',
+            'Le parent attend le résultat',
+            'Reprend sur le dispatcher d\'origine',
+            'Idéal pour une I/O qui retourne (SMTP)',
+          ],
+        },
+        {
+          heading: 'launch(IO)',
+          rows: [
+            'Nouvelle coroutine (Job indépendant)',
+            'Le parent continue sans attendre',
+            'Fire-and-forget',
+            'Pas de résultat sans Deferred',
+          ],
+        },
+      ],
+    },
     points: [
       {
         text: 'withContext(Dispatchers.IO) — switch de thread, résultat attendu',
@@ -786,6 +832,35 @@ private fun setupFilament() {
     section: 'Insights',
     title: 'Koin : durée de vie des dépendances',
     subtitle: 'single · factory · viewModel — le mauvais choix = bug silencieux',
+    visual: {
+      kind: 'compare',
+      columns: [
+        {
+          heading: 'single',
+          rows: [
+            'Une instance pour toute l\'app',
+            'Repository, AppDatabase, EmailService',
+            '⚠ ViewModel en single = fuite mémoire',
+          ],
+        },
+        {
+          heading: 'factory',
+          rows: [
+            'Nouvelle instance à chaque get()',
+            '⚠ Repository en factory = cache vide',
+            'Rarement le bon choix ici',
+          ],
+        },
+        {
+          heading: 'viewModel',
+          rows: [
+            'Lié au ViewModelStore Android',
+            'Survit aux rotations',
+            'Détruit en quittant l\'écran',
+          ],
+        },
+      ],
+    },
     points: [
       {
         text: 'single { } — une seule instance pour toute l\'app',
@@ -814,6 +889,29 @@ private fun setupFilament() {
     section: 'Insights',
     title: 'StateFlow vs LiveData',
     subtitle: 'Pourquoi StateFlow en 2025',
+    visual: {
+      kind: 'compare',
+      columns: [
+        {
+          heading: 'LiveData',
+          rows: [
+            'Importe androidx.lifecycle',
+            'ViewModel dépendant d\'Android',
+            'Test : InstantTaskExecutorRule requis',
+            '.value nullable → NPE possible',
+          ],
+        },
+        {
+          heading: 'StateFlow',
+          rows: [
+            'kotlinx-coroutines, zéro Android',
+            'Testable en JVM pur (runTest)',
+            'Valeur initiale obligatoire',
+            'collectAsStateWithLifecycle() côté UI',
+          ],
+        },
+      ],
+    },
     points: [
       {
         text: 'LiveData — lifecycle-aware mais dépendante d\'Android',

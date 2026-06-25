@@ -94,7 +94,9 @@ export default function Oral() {
       <main className="flex-1 flex items-center justify-center pt-24 pb-16 px-8 lg:px-24">
         <div
           key={`${step.slideIndex}-${step.kind}-${step.kind === 'zoom' ? step.pointIndex : ''}`}
-          className={`w-full slide-enter ${step.kind === 'overview' ? 'max-w-3xl' : 'max-w-5xl'}`}
+          className={`w-full slide-enter ${
+            step.kind === 'overview' && !SLIDES[step.slideIndex].visual ? 'max-w-3xl' : 'max-w-5xl'
+          }`}
         >
           <SlideView step={step} />
         </div>

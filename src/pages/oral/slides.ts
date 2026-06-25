@@ -7,11 +7,18 @@ export interface SlidePoint {
   diagram?: 'architecture' | 'db'
 }
 
+export type SlideVisual =
+  | { kind: 'image'; src: string; caption?: string }
+  | { kind: 'diagram'; name: 'architecture' | 'db' }
+  | { kind: 'stats'; items: { value: string; label: string }[] }
+  | { kind: 'compare'; columns: { heading: string; rows: string[] }[] }
+
 export interface Slide {
   id: string
   section: string
   title: string
   subtitle?: string
+  visual?: SlideVisual
   points: SlidePoint[]
 }
 

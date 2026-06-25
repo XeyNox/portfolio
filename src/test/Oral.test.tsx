@@ -81,7 +81,7 @@ describe('Oral', () => {
   it('navigates to the next slide after one click (first slide has no visual points)', async () => {
     renderOral()
     await userEvent.click(screen.getByRole('button', { name: 'Diapositive suivante' }))
-    expect(screen.getByText('SMP Moules')).toBeInTheDocument()
+    expect(screen.getByText('Problématique métier')).toBeInTheDocument()
   })
 
   it('disables the prev button on the first slide', () => {

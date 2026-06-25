@@ -29,22 +29,19 @@ export const SLIDES: Slide[] = [
     section: 'Introduction',
     title: 'SMP-Commercial',
     subtitle: 'Application Android de présentation commerciale — Titre RNCP Développeur Full Stack · Niveau 6',
+    visual: {
+      kind: 'stats',
+      items: [
+        { value: '50+', label: 'ans d\'expertise' },
+        { value: '1000+', label: 'moules produits' },
+        { value: '3', label: 'secteurs : pharma · cosméto · emballage' },
+        { value: '100%', label: 'Made in France' },
+      ],
+    },
     points: [
       { text: 'Loic Michaud', detail: 'Développeur Full Stack en alternance, passionné par le mobile natif et les architectures propres.' },
       { text: 'Alternance chez SMP Moules', detail: 'Entreprise industrielle basée en France, spécialisée dans la fabrication de moules de précision pour les secteurs pharmacie, cosmétique et emballage.' },
       { text: 'Année 2025–2026', detail: "Projet développé sur l'intégralité de l'année d'alternance, de la conception à la livraison de l'APK signé en production." },
-    ],
-  },
-  {
-    id: 'entreprise',
-    section: 'Introduction',
-    title: 'SMP Moules',
-    subtitle: "Contexte de l'alternance",
-    points: [
-      { text: "Entreprise spécialisée dans la fabrication de moules industriels", detail: "SMP Moules conçoit et fabrique des moules de précision utilisés dans les processus d'injection plastique pour des industries exigeantes." },
-      { text: "Secteurs clients : pharmacie, cosmétique, emballage", detail: "Les clients finaux sont des groupes internationaux qui imposent des tolérances très strictes — ce qui exige une présentation commerciale irréprochable en salon." },
-      { text: "Besoin : moderniser la présentation commerciale en salon professionnel", detail: "Les équipes commerciales participaient à des salons professionnels avec des catalogues papier statiques, sans possibilité de montrer des vidéos ou de mémoriser les contacts rencontrés." },
-      { text: "Mon rôle : développeur mobile et informaticien en alternance", detail: "J'ai assuré la conception, le développement, les tests et la livraison de l'application en totale autonomie, en lien direct avec les commerciaux utilisateurs." },
     ],
   },
   {
@@ -60,23 +57,18 @@ export const SLIDES: Slide[] = [
     ],
   },
   {
-    id: 'objectifs',
-    section: 'Introduction',
-    title: 'Objectifs du projet',
-    points: [
-      { text: "Catalogue produit multimédia : images, vidéos, PDF", detail: "Chaque produit dispose d'une fiche avec galerie photos, vidéo de démonstration et plan technique PDF, tous stockés localement sur la tablette." },
-      { text: "Formulaire de capture de leads avec photo de carte de visite", detail: "Un formulaire structuré permet de saisir société, secteur, email, téléphone et de photographier la carte de visite du prospect directement avec l'appareil photo de la tablette." },
-      { text: "Fonctionnement hors ligne avec base de données locale", detail: "Room SQLite est la source de vérité unique — aucune donnée ne transite par internet pendant l'utilisation en salon, garantissant une disponibilité 100% même sans WiFi." },
-      { text: "Panel admin pour mettre à jour les contenus sans redéployer", detail: "Les commerciaux peuvent modifier textes, photos et vidéos directement depuis la tablette, sans intervention du développeur ni mise à jour de l'application." },
-      { text: "Export des contacts par email avec rapport PDF", detail: "Après chaque salon, l'admin déclenche l'envoi par email d'un rapport PDF listant tous les leads capturés, avec leurs coordonnées et secteurs d'intérêt." },
-    ],
-  },
-
-  {
     id: 'cdc-objectifs',
     section: 'Introduction',
-    title: 'Cahier des charges',
+    title: 'Objectifs & cahier des charges',
     subtitle: 'Les 5 objectifs définis en amont',
+    visual: {
+      kind: 'stats',
+      items: [
+        { value: '5', label: 'objectifs fonctionnels' },
+        { value: '2', label: 'profils : visiteur · admin' },
+        { value: '100%', label: 'hors ligne — priorité absolue' },
+      ],
+    },
     points: [
       {
         text: 'Prise de contacts clients — formulaire + envoi email différé',
@@ -275,6 +267,17 @@ val repositoryModule = module {
     section: 'Stack',
     title: 'Stack technique',
     subtitle: "Vue d'ensemble",
+    visual: {
+      kind: 'stats',
+      items: [
+        { value: 'Kotlin 2.1', label: 'langage (compilateur K2)' },
+        { value: 'Compose', label: 'UI Material 3' },
+        { value: 'Room 2.6', label: 'persistance SQLite' },
+        { value: 'Koin 3.5', label: 'injection de dépendances' },
+        { value: 'minSdk 24', label: 'Android 7.0 → 95% du parc' },
+        { value: 'target 35', label: 'Android 15' },
+      ],
+    },
     points: [
       { text: "Langage : Kotlin 2.1.0 — coroutines, extension functions, sealed classes", detail: "Kotlin 2.1.0 apporte le compilateur K2 plus rapide et des improvements sur les sealed classes. Les coroutines remplacent tous les callbacks et les AsyncTask obsolètes d'Android." },
       { text: "UI : Jetpack Compose + Material 3 (BOM 2024.12)", detail: "La BOM (Bill of Materials) 2024.12 garantit la cohérence des versions de toutes les librairies Compose. Material 3 fournit les composants visuels (Card, Button, Dialog) et le système de couleurs dynamiques." },
@@ -942,6 +945,16 @@ private fun setupFilament() {
     section: 'Compétences',
     title: 'Référentiel RNCP Niveau 6',
     subtitle: "Concepteur Développeur d'Applications Full Stack",
+    visual: {
+      kind: 'stats',
+      items: [
+        { value: 'C1', label: 'Architecture applicative' },
+        { value: 'C2', label: 'Interfaces utilisateur' },
+        { value: 'C3', label: 'Base de données' },
+        { value: 'C4', label: 'Composants métier' },
+        { value: 'C5', label: 'Contexte professionnel' },
+      ],
+    },
     points: [
       { text: "C1 — Analyser les besoins et concevoir l'architecture applicative", detail: "Traduit le besoin métier (présentation salon, capture leads) en architecture MVVM + Clean avec 3 couches, 5 entités Room et un NavGraph de 12 écrans documentés." },
       { text: "C2 — Développer des interfaces utilisateur adaptatives", detail: "Jetpack Compose + Material 3 avec ScreenType enum pour adapter automatiquement le layout phone/tablette. Mode kiosque fullscreen via WindowInsetsController." },
@@ -1024,6 +1037,17 @@ interface ContactDao {
     section: 'Bilan',
     title: 'Chiffres clés du projet',
     subtitle: 'Le projet en quelques mesures',
+    visual: {
+      kind: 'stats',
+      items: [
+        { value: '~9 700', label: 'lignes de Kotlin' },
+        { value: '70', label: 'fichiers' },
+        { value: '13', label: 'écrans' },
+        { value: '7', label: 'ViewModels' },
+        { value: '5', label: 'entités Room' },
+        { value: '10+', label: 'librairies majeures' },
+      ],
+    },
     points: [
       { text: "~9 700 lignes de Kotlin réparties sur 70 fichiers", detail: "Une base de code conséquente mais structurée, organisée en couches Domain / Data / Presentation suivant l'architecture Clean." },
       { text: "13 écrans · 7 ViewModels · 5 repositories · 5 DAOs · 5 entités Room", detail: "Chaque écran majeur possède son ViewModel ; chaque entité métier son repository (interface + implémentation) et son DAO Room, pour un découplage strict." },

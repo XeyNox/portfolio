@@ -1,6 +1,8 @@
-import { SLIDES, type Slide, type Step } from './slides'
+import { SLIDES, type Slide, type SlideVisual, type Step } from './slides'
 import ArchitectureDiagram from './diagrams/ArchitectureDiagram'
 import DbSchemaDiagram from './diagrams/DbSchemaDiagram'
+import StatGrid from './visuals/StatGrid'
+import CompareColumns from './visuals/CompareColumns'
 
 interface SlideViewProps {
   step: Step
@@ -10,8 +12,30 @@ function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
 }
 
-function OverviewSlide({ slide }: { slide: Slide }) {
-  return (
+function renderVisual(visual: SlideVisual) {
+  switch (visual.kind) {
+    case 'image':
+      return (
+        <figure className="flex flex-col items-center gap-3">
+          <img
+            src={asset(visual.src)}
+            alt={visual.caption ?? ''}
+            className="max-h-[60vh] w-full rounded-lg object-contain"
+          />
+          {visual.caption && <figcaption className="text-sm text-zinc-500">{visual.caption}</figcaption>}
+        </figure>
+      )
+    case 'diagram':
+      return visual.name === 'architecture' ? <ArchitectureDiagram /> : <DbSchemaDiagram />
+    case 'stats':
+      return <StatGrid items={visual.items} />
+    case 'compare':
+      return <CompareColumns columns={visual.columns} />
+  }
+}
+
+export function OverviewSlide({ slide }: { slide: Slide }) {
+  const header = (
     <>
       <p className="font-mono text-xs text-[#e8ff00] mb-6 uppercase tracking-widest">
         {slide.section}
@@ -20,15 +44,37 @@ function OverviewSlide({ slide }: { slide: Slide }) {
         {slide.title}
       </h1>
       {slide.subtitle && <p className="text-zinc-400 text-lg mb-10">{slide.subtitle}</p>}
-      <ul className="space-y-4 mt-8">
-        {slide.points.map(point => (
-          <li key={point.text} className="flex items-start gap-4 text-zinc-300 text-lg">
-            <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
-            <span>{point.text}</span>
-          </li>
-        ))}
-      </ul>
     </>
+  )
+
+  const bullets = (
+    <ul className="space-y-4 mt-8">
+      {slide.points.map(point => (
+        <li key={point.text} className="flex items-start gap-4 text-zinc-300 text-lg">
+          <span className="text-[#e8ff00] mt-1 shrink-0 font-mono">—</span>
+          <span>{point.text}</span>
+        </li>
+      ))}
+    </ul>
+  )
+
+  if (!slide.visual) {
+    return (
+      <>
+        {header}
+        {bullets}
+      </>
+    )
+  }
+
+  return (
+    <div className="grid gap-12 items-center lg:grid-cols-2">
+      <div>
+        {header}
+        {bullets}
+      </div>
+      <div className="flex items-center justify-center">{renderVisual(slide.visual)}</div>
+    </div>
   )
 }
 

@@ -321,6 +321,7 @@ val repositoryModule = module {
     id: 'accueil',
     section: 'Fonctionnalités',
     title: "Écran d'accueil",
+    visual: { kind: 'image', src: '/oral/figma/app-accueil.jpg', caption: 'Écran d\'accueil' },
     points: [
       { text: "Page d'entrée de l'application kiosque", detail: "L'écran d'accueil est la première vue que le visiteur voit sur le stand. Il donne une impression professionnelle immédiate avec le branding SMP Moules et une invitation à explorer le catalogue." },
       { text: "Branding SMP Moules avec logo et présentation", detail: "Logo, slogan et chiffres clés de l'entreprise (années d'expérience, nombre de clients, secteurs) affichés avec un layout éditorial. Tous les textes sont éditables inline par l'admin." },
@@ -334,6 +335,7 @@ val repositoryModule = module {
     section: 'Fonctionnalités',
     title: 'Catalogue produits',
     subtitle: 'Grille de catégories',
+    visual: { kind: 'image', src: '/oral/figma/app-catalogue.jpg', caption: 'Grille de catégories' },
     points: [
       { text: "Grille responsive — 2 colonnes (téléphone) · 3+ (tablette)", detail: "LazyVerticalGrid adapte automatiquement le nombre de colonnes selon la largeur d'écran via GridCells.Adaptive(minSize = 180.dp) — 2 colonnes sur téléphone, 3 ou 4 sur tablette." },
       { text: "Cartes catégorie avec emoji, image et nom", detail: "Chaque CategoryCard affiche l'emoji représentatif, l'image de couverture chargée par Coil et le nom de la catégorie. Un effet d'élévation Material 3 indique l'interactivité au visiteur." },
@@ -383,6 +385,7 @@ val repositoryModule = module {
     section: 'Fonctionnalités',
     title: 'Formulaire de contact',
     subtitle: 'Capture de leads en salon',
+    visual: { kind: 'image', src: '/oral/figma/app-contact.jpg', caption: 'Formulaire de capture' },
     points: [
       { text: "Champs : société, interlocuteur, email, téléphone, notes", detail: "Chaque champ est un OutlinedTextField Material 3 avec validation en temps réel. Le champ email vérifie le format via regex et affiche une erreur inline avant la soumission." },
       { text: "Secteurs (cases à cocher) : Pharmacie · Cosmétique · Emballage · Auto · Aéro · Électronique · Agri · Autre", detail: "Les secteurs sont stockés en JSON dans la colonne sectors de la table CONTACTS. Le visiteur peut sélectionner plusieurs secteurs — permettant une qualification précise du prospect." },
